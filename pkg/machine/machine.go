@@ -5,11 +5,21 @@ import (
 	"time"
 
 	portscanner "github.com/anvie/port-scanner"
+
+	machine "github.com/kolya59/virus/proto"
 )
 
 type Port struct {
 	Port    int
 	Service string
+}
+
+func (p *Port) ToGRPC() *machine.Port {
+	converted := &machine.Port{
+		Port:    uint32(p.Port),
+		Service: p.Service,
+	}
+	return converted
 }
 
 type Address struct {
@@ -32,14 +42,38 @@ func (a *Address) ScanPorts() {
 	}
 }
 
-type ExtenedIface struct {
+func (a *Address) ToGRPC() *machine.Address {
+	converted := &machine.Address{}
+	converted.Ip = a.IP.String()
+	converted.Ports = make([]*machine.Port, len(a.OpenedPorts))
+	for i, port := range a.OpenedPorts {
+		converted.Ports[i] = port.ToGRPC()
+	}
+	return converted
+}
+
+type ExtendedIface struct {
 	Iface     string
 	Addresses []Address
 	Err       error
 }
 
+func (i *ExtendedIface) ToGRPC() *machine.Iface {
+	converted := &machine.Iface{}
+	if i.Err != nil {
+		addresses := make([]*machine.Address, len(i.Addresses))
+		for i, address := range i.Addresses {
+			addresses[i] = address.ToGRPC()
+		}
+	} else {
+		converted.Error = i.Err.Error()
+	}
+
+	return converted
+}
+
 type Machine struct {
-	Ifaces []ExtenedIface
+	Ifaces []ExtendedIface
 	Err    error
 }
 
@@ -49,7 +83,7 @@ func (m *Machine) GetIPS() {
 		m.Err = err
 		return
 	}
-	var extenedIfaces []ExtenedIface
+	var extenedIfaces []ExtendedIface
 	for i, iface := range ifaces {
 		addrs, err := iface.Addrs()
 		if err != nil {
@@ -75,11 +109,26 @@ func (m *Machine) GetIPS() {
 			}
 		}
 		if extendedAddresses != nil {
-			extenedIfaces = append(extenedIfaces, ExtenedIface{
+			extenedIfaces = append(extenedIfaces, ExtendedIface{
 				Iface:     iface.Name,
 				Addresses: extendedAddresses,
 			})
 		}
 	}
 	m.Ifaces = extenedIfaces
+}
+
+func (m *Machine) ToGRPC() *machine.Machine {
+	converted := &machine.Machine{}
+	if m.Err != nil {
+		ifaces := make([]*machine.Iface, len(m.Ifaces))
+		for i, iface := range m.Ifaces {
+			ifaces[i] = iface.ToGRPC()
+		}
+		converted.Ifaces = ifaces
+	} else {
+		converted.Error = m.Err.Error()
+	}
+
+	return converted
 }
