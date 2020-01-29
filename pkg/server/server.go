@@ -6,8 +6,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -88,5 +90,38 @@ func SendData(machine machine.Machine) {
 	// TODO: Handle error
 	if r.GetMessage() == "OK" {
 
+	}
+}
+
+func Register() {
+	// Connect to db
+	// Send ip to db
+}
+
+type server struct {
+	pb.UnimplementedMachineSaverServer
+}
+
+func (s *server) Check(ctx context.Context, in *pb.HealthCheckRequest) (*pb.HealthCheckResponse, error) {
+	return &pb.HealthCheckResponse{Status: pb.HealthCheckResponse_SERVING}, nil
+}
+
+func (s *server) SaveMachine(ctx context.Context, in *pb.SaveMachineRequest) (*pb.SaveMachineResponse, error) {
+	return &pb.SaveMachineResponse{Status: pb.SaveMachineResponse_UNKNOWN}, nil
+}
+
+func (s *server) GetCertificate(ctx context.Context, in *pb.GetCertificateRequest) (*pb.GetCertificateResponse, error) {
+	return &pb.GetCertificateResponse{Certificate: "Implement me"}, nil
+}
+
+func StartServer(host, port string, done <-chan interface{}) {
+	lis, err := net.Listen("tcp", fmt.Sprintf("%v:%v", host, port))
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to listen")
+	}
+	s := grpc.NewServer()
+	pb.RegisterMachineSaverServer(s, &server{})
+	if err := s.Serve(lis); err != nil {
+		log.Fatal().Err(err).Msg("Failed to serve")
 	}
 }

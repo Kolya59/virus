@@ -3,7 +3,9 @@ syntax = "proto3";
 package machine;
 
 service MachineSaver {
-    rpc SaveMachine (SaveRequest) returns (SaveReply) {}
+    rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+    rpc SaveMachine (SaveMachineRequest) returns (SaveMachineResponse);
+    rpc GetCertificate(GetCertificateRequest) returns (GetCertificateResponse);
 }
 
 message Port {
@@ -28,10 +30,34 @@ message Machine {
     string error = 3;
 }
 
-message SaveRequest {
+message SaveMachineRequest {
     Machine machine = 1;
 }
 
-message SaveReply {
-    string message = 1;
+message SaveMachineResponse {
+    enum RequestStatus {
+        UNKNOWN = 0;
+        ACCEPTED = 1;
+        NOT_ACCEPTED = 2;
+    }
+    RequestStatus status = 1;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+    enum ServingStatus {
+        UNKNOWN = 0;
+        SERVING = 1;
+        NOT_SERVING = 2;
+    }
+    ServingStatus status = 1;
+}
+
+message GetCertificateRequest {
+    string uuid = 1;
+}
+
+message GetCertificateResponse {
+    string certificate = 1;
 }

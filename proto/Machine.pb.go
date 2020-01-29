@@ -24,6 +24,62 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type SaveMachineResponse_RequestStatus int32
+
+const (
+	SaveMachineResponse_UNKNOWN      SaveMachineResponse_RequestStatus = 0
+	SaveMachineResponse_ACCEPTED     SaveMachineResponse_RequestStatus = 1
+	SaveMachineResponse_NOT_ACCEPTED SaveMachineResponse_RequestStatus = 2
+)
+
+var SaveMachineResponse_RequestStatus_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "ACCEPTED",
+	2: "NOT_ACCEPTED",
+}
+
+var SaveMachineResponse_RequestStatus_value = map[string]int32{
+	"UNKNOWN":      0,
+	"ACCEPTED":     1,
+	"NOT_ACCEPTED": 2,
+}
+
+func (x SaveMachineResponse_RequestStatus) String() string {
+	return proto.EnumName(SaveMachineResponse_RequestStatus_name, int32(x))
+}
+
+func (SaveMachineResponse_RequestStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{5, 0}
+}
+
+type HealthCheckResponse_ServingStatus int32
+
+const (
+	HealthCheckResponse_UNKNOWN     HealthCheckResponse_ServingStatus = 0
+	HealthCheckResponse_SERVING     HealthCheckResponse_ServingStatus = 1
+	HealthCheckResponse_NOT_SERVING HealthCheckResponse_ServingStatus = 2
+)
+
+var HealthCheckResponse_ServingStatus_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "SERVING",
+	2: "NOT_SERVING",
+}
+
+var HealthCheckResponse_ServingStatus_value = map[string]int32{
+	"UNKNOWN":     0,
+	"SERVING":     1,
+	"NOT_SERVING": 2,
+}
+
+func (x HealthCheckResponse_ServingStatus) String() string {
+	return proto.EnumName(HealthCheckResponse_ServingStatus_name, int32(x))
+}
+
+func (HealthCheckResponse_ServingStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{7, 0}
+}
+
 type Port struct {
 	Port                 uint32   `protobuf:"varint,1,opt,name=port,proto3" json:"port,omitempty"`
 	Service              string   `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
@@ -228,116 +284,282 @@ func (m *Machine) GetError() string {
 	return ""
 }
 
-type SaveRequest struct {
+type SaveMachineRequest struct {
 	Machine              *Machine `protobuf:"bytes,1,opt,name=machine,proto3" json:"machine,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SaveRequest) Reset()         { *m = SaveRequest{} }
-func (m *SaveRequest) String() string { return proto.CompactTextString(m) }
-func (*SaveRequest) ProtoMessage()    {}
-func (*SaveRequest) Descriptor() ([]byte, []int) {
+func (m *SaveMachineRequest) Reset()         { *m = SaveMachineRequest{} }
+func (m *SaveMachineRequest) String() string { return proto.CompactTextString(m) }
+func (*SaveMachineRequest) ProtoMessage()    {}
+func (*SaveMachineRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_49547078e0f55cfe, []int{4}
 }
 
-func (m *SaveRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SaveRequest.Unmarshal(m, b)
+func (m *SaveMachineRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SaveMachineRequest.Unmarshal(m, b)
 }
-func (m *SaveRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SaveRequest.Marshal(b, m, deterministic)
+func (m *SaveMachineRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SaveMachineRequest.Marshal(b, m, deterministic)
 }
-func (m *SaveRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SaveRequest.Merge(m, src)
+func (m *SaveMachineRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SaveMachineRequest.Merge(m, src)
 }
-func (m *SaveRequest) XXX_Size() int {
-	return xxx_messageInfo_SaveRequest.Size(m)
+func (m *SaveMachineRequest) XXX_Size() int {
+	return xxx_messageInfo_SaveMachineRequest.Size(m)
 }
-func (m *SaveRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SaveRequest.DiscardUnknown(m)
+func (m *SaveMachineRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SaveMachineRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SaveRequest proto.InternalMessageInfo
+var xxx_messageInfo_SaveMachineRequest proto.InternalMessageInfo
 
-func (m *SaveRequest) GetMachine() *Machine {
+func (m *SaveMachineRequest) GetMachine() *Machine {
 	if m != nil {
 		return m.Machine
 	}
 	return nil
 }
 
-type SaveReply struct {
-	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+type SaveMachineResponse struct {
+	Status               SaveMachineResponse_RequestStatus `protobuf:"varint,1,opt,name=status,proto3,enum=machine.SaveMachineResponse_RequestStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
+	XXX_unrecognized     []byte                            `json:"-"`
+	XXX_sizecache        int32                             `json:"-"`
+}
+
+func (m *SaveMachineResponse) Reset()         { *m = SaveMachineResponse{} }
+func (m *SaveMachineResponse) String() string { return proto.CompactTextString(m) }
+func (*SaveMachineResponse) ProtoMessage()    {}
+func (*SaveMachineResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{5}
+}
+
+func (m *SaveMachineResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SaveMachineResponse.Unmarshal(m, b)
+}
+func (m *SaveMachineResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SaveMachineResponse.Marshal(b, m, deterministic)
+}
+func (m *SaveMachineResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SaveMachineResponse.Merge(m, src)
+}
+func (m *SaveMachineResponse) XXX_Size() int {
+	return xxx_messageInfo_SaveMachineResponse.Size(m)
+}
+func (m *SaveMachineResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_SaveMachineResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SaveMachineResponse proto.InternalMessageInfo
+
+func (m *SaveMachineResponse) GetStatus() SaveMachineResponse_RequestStatus {
+	if m != nil {
+		return m.Status
+	}
+	return SaveMachineResponse_UNKNOWN
+}
+
+type HealthCheckRequest struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SaveReply) Reset()         { *m = SaveReply{} }
-func (m *SaveReply) String() string { return proto.CompactTextString(m) }
-func (*SaveReply) ProtoMessage()    {}
-func (*SaveReply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49547078e0f55cfe, []int{5}
+func (m *HealthCheckRequest) Reset()         { *m = HealthCheckRequest{} }
+func (m *HealthCheckRequest) String() string { return proto.CompactTextString(m) }
+func (*HealthCheckRequest) ProtoMessage()    {}
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{6}
 }
 
-func (m *SaveReply) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SaveReply.Unmarshal(m, b)
+func (m *HealthCheckRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HealthCheckRequest.Unmarshal(m, b)
 }
-func (m *SaveReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SaveReply.Marshal(b, m, deterministic)
+func (m *HealthCheckRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HealthCheckRequest.Marshal(b, m, deterministic)
 }
-func (m *SaveReply) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SaveReply.Merge(m, src)
+func (m *HealthCheckRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckRequest.Merge(m, src)
 }
-func (m *SaveReply) XXX_Size() int {
-	return xxx_messageInfo_SaveReply.Size(m)
+func (m *HealthCheckRequest) XXX_Size() int {
+	return xxx_messageInfo_HealthCheckRequest.Size(m)
 }
-func (m *SaveReply) XXX_DiscardUnknown() {
-	xxx_messageInfo_SaveReply.DiscardUnknown(m)
+func (m *HealthCheckRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_HealthCheckRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SaveReply proto.InternalMessageInfo
+var xxx_messageInfo_HealthCheckRequest proto.InternalMessageInfo
 
-func (m *SaveReply) GetMessage() string {
+type HealthCheckResponse struct {
+	Status               HealthCheckResponse_ServingStatus `protobuf:"varint,1,opt,name=status,proto3,enum=machine.HealthCheckResponse_ServingStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
+	XXX_unrecognized     []byte                            `json:"-"`
+	XXX_sizecache        int32                             `json:"-"`
+}
+
+func (m *HealthCheckResponse) Reset()         { *m = HealthCheckResponse{} }
+func (m *HealthCheckResponse) String() string { return proto.CompactTextString(m) }
+func (*HealthCheckResponse) ProtoMessage()    {}
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{7}
+}
+
+func (m *HealthCheckResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HealthCheckResponse.Unmarshal(m, b)
+}
+func (m *HealthCheckResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HealthCheckResponse.Marshal(b, m, deterministic)
+}
+func (m *HealthCheckResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckResponse.Merge(m, src)
+}
+func (m *HealthCheckResponse) XXX_Size() int {
+	return xxx_messageInfo_HealthCheckResponse.Size(m)
+}
+func (m *HealthCheckResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_HealthCheckResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HealthCheckResponse proto.InternalMessageInfo
+
+func (m *HealthCheckResponse) GetStatus() HealthCheckResponse_ServingStatus {
 	if m != nil {
-		return m.Message
+		return m.Status
+	}
+	return HealthCheckResponse_UNKNOWN
+}
+
+type GetCertificateRequest struct {
+	Uuid                 string   `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetCertificateRequest) Reset()         { *m = GetCertificateRequest{} }
+func (m *GetCertificateRequest) String() string { return proto.CompactTextString(m) }
+func (*GetCertificateRequest) ProtoMessage()    {}
+func (*GetCertificateRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{8}
+}
+
+func (m *GetCertificateRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetCertificateRequest.Unmarshal(m, b)
+}
+func (m *GetCertificateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetCertificateRequest.Marshal(b, m, deterministic)
+}
+func (m *GetCertificateRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetCertificateRequest.Merge(m, src)
+}
+func (m *GetCertificateRequest) XXX_Size() int {
+	return xxx_messageInfo_GetCertificateRequest.Size(m)
+}
+func (m *GetCertificateRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetCertificateRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetCertificateRequest proto.InternalMessageInfo
+
+func (m *GetCertificateRequest) GetUuid() string {
+	if m != nil {
+		return m.Uuid
+	}
+	return ""
+}
+
+type GetCertificateResponse struct {
+	Certificate          string   `protobuf:"bytes,1,opt,name=certificate,proto3" json:"certificate,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetCertificateResponse) Reset()         { *m = GetCertificateResponse{} }
+func (m *GetCertificateResponse) String() string { return proto.CompactTextString(m) }
+func (*GetCertificateResponse) ProtoMessage()    {}
+func (*GetCertificateResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49547078e0f55cfe, []int{9}
+}
+
+func (m *GetCertificateResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetCertificateResponse.Unmarshal(m, b)
+}
+func (m *GetCertificateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetCertificateResponse.Marshal(b, m, deterministic)
+}
+func (m *GetCertificateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetCertificateResponse.Merge(m, src)
+}
+func (m *GetCertificateResponse) XXX_Size() int {
+	return xxx_messageInfo_GetCertificateResponse.Size(m)
+}
+func (m *GetCertificateResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetCertificateResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetCertificateResponse proto.InternalMessageInfo
+
+func (m *GetCertificateResponse) GetCertificate() string {
+	if m != nil {
+		return m.Certificate
 	}
 	return ""
 }
 
 func init() {
+	proto.RegisterEnum("machine.SaveMachineResponse_RequestStatus", SaveMachineResponse_RequestStatus_name, SaveMachineResponse_RequestStatus_value)
+	proto.RegisterEnum("machine.HealthCheckResponse_ServingStatus", HealthCheckResponse_ServingStatus_name, HealthCheckResponse_ServingStatus_value)
 	proto.RegisterType((*Port)(nil), "machine.Port")
 	proto.RegisterType((*Address)(nil), "machine.Address")
 	proto.RegisterType((*Iface)(nil), "machine.Iface")
 	proto.RegisterType((*Machine)(nil), "machine.Machine")
-	proto.RegisterType((*SaveRequest)(nil), "machine.SaveRequest")
-	proto.RegisterType((*SaveReply)(nil), "machine.SaveReply")
+	proto.RegisterType((*SaveMachineRequest)(nil), "machine.SaveMachineRequest")
+	proto.RegisterType((*SaveMachineResponse)(nil), "machine.SaveMachineResponse")
+	proto.RegisterType((*HealthCheckRequest)(nil), "machine.HealthCheckRequest")
+	proto.RegisterType((*HealthCheckResponse)(nil), "machine.HealthCheckResponse")
+	proto.RegisterType((*GetCertificateRequest)(nil), "machine.GetCertificateRequest")
+	proto.RegisterType((*GetCertificateResponse)(nil), "machine.GetCertificateResponse")
 }
 
 func init() { proto.RegisterFile("Machine.proto", fileDescriptor_49547078e0f55cfe) }
 
 var fileDescriptor_49547078e0f55cfe = []byte{
-	// 292 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0xc1, 0x4b, 0xc3, 0x30,
-	0x14, 0xc6, 0x6d, 0xb7, 0xae, 0xf4, 0xcd, 0x0e, 0x79, 0xec, 0x50, 0x3c, 0x95, 0x8a, 0x52, 0x3c,
-	0xf4, 0x30, 0xbd, 0x78, 0x11, 0x3c, 0xee, 0x20, 0x48, 0x3c, 0x8a, 0x87, 0xd8, 0x3e, 0x35, 0xb0,
-	0xae, 0x31, 0x69, 0x07, 0xfb, 0xef, 0x25, 0x69, 0x52, 0x86, 0xe0, 0xed, 0x7d, 0x4d, 0xbe, 0xef,
-	0xf7, 0xbd, 0x14, 0xd2, 0x67, 0x5e, 0x7f, 0x8b, 0x3d, 0x55, 0x52, 0x75, 0x7d, 0x87, 0x71, 0x3b,
-	0xca, 0xe2, 0x1e, 0xe6, 0x2f, 0x9d, 0xea, 0x11, 0x61, 0x2e, 0x3b, 0xd5, 0x67, 0x41, 0x1e, 0x94,
-	0x29, 0xb3, 0x33, 0x66, 0x10, 0x6b, 0x52, 0x07, 0x51, 0x53, 0x16, 0xe6, 0x41, 0x99, 0x30, 0x2f,
-	0x8b, 0x47, 0x88, 0x9f, 0x9a, 0x46, 0x91, 0xd6, 0xb8, 0x82, 0x50, 0x48, 0x6b, 0x4b, 0x58, 0x28,
-	0x24, 0x5e, 0x41, 0x64, 0xcc, 0x3a, 0x0b, 0xf3, 0x59, 0xb9, 0xdc, 0xa4, 0x95, 0x23, 0x55, 0x06,
-	0xc3, 0xc6, 0xb3, 0xe2, 0x1d, 0xa2, 0xed, 0x27, 0xaf, 0xc9, 0x60, 0xf7, 0xbc, 0x25, 0xe7, 0xb7,
-	0x33, 0xde, 0x42, 0xcc, 0xc7, 0x70, 0x97, 0x71, 0x31, 0x65, 0x38, 0x28, 0xf3, 0x17, 0x70, 0x0d,
-	0x11, 0x29, 0xd5, 0xa9, 0x6c, 0x66, 0x03, 0x46, 0x51, 0xbc, 0x41, 0xec, 0xd6, 0x35, 0x80, 0x61,
-	0x10, 0x8d, 0x07, 0x98, 0x19, 0x6f, 0x60, 0x21, 0x0c, 0xdd, 0xe7, 0xaf, 0xa6, 0x7c, 0x5b, 0x8a,
-	0xb9, 0xd3, 0x7f, 0xc2, 0x1f, 0x60, 0xf9, 0xca, 0x0f, 0xc4, 0xe8, 0x67, 0x20, 0xdd, 0x9b, 0xb6,
-	0xce, 0x6d, 0x19, 0xa7, 0x6d, 0x5d, 0x07, 0x36, 0x3d, 0xf6, 0x35, 0x24, 0xa3, 0x55, 0xee, 0x8e,
-	0xe6, 0x75, 0x5b, 0xd2, 0x9a, 0x7f, 0xf9, 0xed, 0xbd, 0xdc, 0x6c, 0xe1, 0xdc, 0x59, 0xcd, 0x6d,
-	0x85, 0x8e, 0xe8, 0x57, 0x5a, 0x4f, 0x80, 0x93, 0x1e, 0x97, 0xf8, 0xe7, 0xab, 0xdc, 0x1d, 0x8b,
-	0xb3, 0x8f, 0x85, 0xfd, 0xdd, 0x77, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x30, 0x07, 0xe9, 0x63,
-	0xff, 0x01, 0x00, 0x00,
+	// 483 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x94, 0xdf, 0x6e, 0xd3, 0x30,
+	0x14, 0xc6, 0x49, 0xb6, 0x36, 0xec, 0xa4, 0x29, 0xd1, 0xd9, 0x40, 0xd1, 0x40, 0x50, 0x19, 0x09,
+	0x55, 0x43, 0xca, 0x45, 0xe1, 0x6a, 0x42, 0x88, 0xad, 0x54, 0xdb, 0x84, 0xc8, 0x86, 0x3b, 0xe0,
+	0x02, 0x21, 0x14, 0x52, 0x8f, 0x46, 0xb0, 0x26, 0xd8, 0xce, 0xde, 0x04, 0xf1, 0x98, 0xbc, 0x02,
+	0xb2, 0xe3, 0x84, 0x64, 0xa4, 0x70, 0x17, 0x9f, 0x3f, 0xbf, 0xef, 0x3b, 0x3e, 0x56, 0xc0, 0x7b,
+	0x1d, 0x27, 0xcb, 0x74, 0xc5, 0xc2, 0x9c, 0x67, 0x32, 0x43, 0xe7, 0xb2, 0x3c, 0x92, 0xa7, 0xb0,
+	0x79, 0x96, 0x71, 0x89, 0x08, 0x9b, 0x79, 0xc6, 0x65, 0x60, 0x8d, 0xac, 0xb1, 0x47, 0xf5, 0x37,
+	0x06, 0xe0, 0x08, 0xc6, 0xaf, 0xd2, 0x84, 0x05, 0xf6, 0xc8, 0x1a, 0x6f, 0xd1, 0xea, 0x48, 0x9e,
+	0x83, 0x73, 0xb0, 0x58, 0x70, 0x26, 0x04, 0x0e, 0xc1, 0x4e, 0x73, 0xdd, 0xb6, 0x45, 0xed, 0x34,
+	0xc7, 0x87, 0xd0, 0x53, 0xcd, 0x22, 0xb0, 0x47, 0x1b, 0x63, 0x77, 0xe2, 0x85, 0x46, 0x29, 0x54,
+	0x32, 0xb4, 0xcc, 0x91, 0x8f, 0xd0, 0x3b, 0xb9, 0x88, 0x13, 0xa6, 0x64, 0x57, 0xf1, 0x25, 0x33,
+	0xfd, 0xfa, 0x1b, 0xf7, 0xc0, 0x89, 0x4b, 0xb8, 0x61, 0xf8, 0x35, 0xc3, 0x88, 0xd2, 0xaa, 0x00,
+	0x77, 0xa0, 0xc7, 0x38, 0xcf, 0x78, 0xb0, 0xa1, 0x01, 0xe5, 0x81, 0x7c, 0x00, 0xc7, 0x8c, 0xab,
+	0x04, 0x8a, 0x22, 0x5d, 0x54, 0x02, 0xea, 0x1b, 0x1f, 0x41, 0x3f, 0x55, 0xea, 0x15, 0x7f, 0x58,
+	0xf3, 0xb5, 0x29, 0x6a, 0xb2, 0x6b, 0xe0, 0x2f, 0x00, 0xe7, 0xf1, 0x15, 0x33, 0x02, 0x94, 0x7d,
+	0x2f, 0x98, 0x90, 0xca, 0xb4, 0x81, 0x68, 0xa9, 0xa6, 0xe9, 0xaa, 0xb2, 0xbe, 0xf3, 0x9f, 0x16,
+	0x6c, 0xb7, 0x10, 0x22, 0xcf, 0x56, 0x82, 0xe1, 0x21, 0xf4, 0x85, 0x8c, 0x65, 0x21, 0x34, 0x62,
+	0x38, 0xd9, 0xab, 0x11, 0x1d, 0xd5, 0xa1, 0x51, 0x9e, 0xeb, 0x0e, 0x6a, 0x3a, 0xc9, 0x33, 0xf0,
+	0x5a, 0x09, 0x74, 0xc1, 0x79, 0x1b, 0xbd, 0x8a, 0x4e, 0xdf, 0x47, 0xfe, 0x0d, 0x1c, 0xc0, 0xcd,
+	0x83, 0xe9, 0x74, 0x76, 0x76, 0x3e, 0x7b, 0xe9, 0x5b, 0xe8, 0xc3, 0x20, 0x3a, 0x3d, 0xff, 0x54,
+	0x47, 0x6c, 0xb2, 0x03, 0x78, 0xcc, 0xe2, 0x6f, 0x72, 0x39, 0x5d, 0xb2, 0xe4, 0xab, 0x01, 0x91,
+	0x1f, 0x16, 0x6c, 0xb7, 0xc2, 0xff, 0xf5, 0xdb, 0x51, 0x1d, 0xce, 0xd5, 0xdb, 0x59, 0x7d, 0xb9,
+	0xe6, 0x77, 0x1f, 0xbc, 0x56, 0xa2, 0xed, 0xd7, 0x05, 0x67, 0x3e, 0xa3, 0xef, 0x4e, 0xa2, 0x23,
+	0xdf, 0xc2, 0x5b, 0xe0, 0x2a, 0xbb, 0x55, 0xc0, 0x26, 0x8f, 0xe1, 0xf6, 0x11, 0x93, 0x53, 0xc6,
+	0x65, 0x7a, 0x91, 0x26, 0xb1, 0xac, 0x97, 0xd1, 0xb1, 0x74, 0xb2, 0x0f, 0x77, 0xae, 0x17, 0x9b,
+	0x31, 0x46, 0xe0, 0x26, 0x7f, 0xc2, 0xa6, 0xa9, 0x19, 0x9a, 0xfc, 0xb2, 0x60, 0x60, 0xae, 0x5f,
+	0x6d, 0x82, 0xe3, 0x21, 0xf4, 0xf4, 0x70, 0x78, 0xb7, 0x7b, 0x64, 0x6d, 0x63, 0xf7, 0xde, 0xbf,
+	0xee, 0x03, 0x8f, 0xc1, 0x6d, 0xac, 0xb5, 0x41, 0xfa, 0xfb, 0x75, 0x35, 0x48, 0x5d, 0xef, 0xe6,
+	0x0d, 0x0c, 0xdb, 0xa3, 0xe1, 0xfd, 0xba, 0xbe, 0xf3, 0x82, 0x76, 0x1f, 0xac, 0xcd, 0x97, 0xc8,
+	0xcf, 0x7d, 0xfd, 0x9b, 0x78, 0xf2, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x95, 0xc1, 0xc0, 0x01, 0x37,
+	0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -352,7 +574,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MachineSaverClient interface {
-	SaveMachine(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveReply, error)
+	Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
+	SaveMachine(ctx context.Context, in *SaveMachineRequest, opts ...grpc.CallOption) (*SaveMachineResponse, error)
+	GetCertificate(ctx context.Context, in *GetCertificateRequest, opts ...grpc.CallOption) (*GetCertificateResponse, error)
 }
 
 type machineSaverClient struct {
@@ -363,9 +587,27 @@ func NewMachineSaverClient(cc *grpc.ClientConn) MachineSaverClient {
 	return &machineSaverClient{cc}
 }
 
-func (c *machineSaverClient) SaveMachine(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveReply, error) {
-	out := new(SaveReply)
+func (c *machineSaverClient) Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, "/machine.MachineSaver/Check", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *machineSaverClient) SaveMachine(ctx context.Context, in *SaveMachineRequest, opts ...grpc.CallOption) (*SaveMachineResponse, error) {
+	out := new(SaveMachineResponse)
 	err := c.cc.Invoke(ctx, "/machine.MachineSaver/SaveMachine", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *machineSaverClient) GetCertificate(ctx context.Context, in *GetCertificateRequest, opts ...grpc.CallOption) (*GetCertificateResponse, error) {
+	out := new(GetCertificateResponse)
+	err := c.cc.Invoke(ctx, "/machine.MachineSaver/GetCertificate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -374,23 +616,49 @@ func (c *machineSaverClient) SaveMachine(ctx context.Context, in *SaveRequest, o
 
 // MachineSaverServer is the server API for MachineSaver service.
 type MachineSaverServer interface {
-	SaveMachine(context.Context, *SaveRequest) (*SaveReply, error)
+	Check(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
+	SaveMachine(context.Context, *SaveMachineRequest) (*SaveMachineResponse, error)
+	GetCertificate(context.Context, *GetCertificateRequest) (*GetCertificateResponse, error)
 }
 
 // UnimplementedMachineSaverServer can be embedded to have forward compatible implementations.
 type UnimplementedMachineSaverServer struct {
 }
 
-func (*UnimplementedMachineSaverServer) SaveMachine(ctx context.Context, req *SaveRequest) (*SaveReply, error) {
+func (*UnimplementedMachineSaverServer) Check(ctx context.Context, req *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+}
+func (*UnimplementedMachineSaverServer) SaveMachine(ctx context.Context, req *SaveMachineRequest) (*SaveMachineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveMachine not implemented")
+}
+func (*UnimplementedMachineSaverServer) GetCertificate(ctx context.Context, req *GetCertificateRequest) (*GetCertificateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCertificate not implemented")
 }
 
 func RegisterMachineSaverServer(s *grpc.Server, srv MachineSaverServer) {
 	s.RegisterService(&_MachineSaver_serviceDesc, srv)
 }
 
+func _MachineSaver_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineSaverServer).Check(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/machine.MachineSaver/Check",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineSaverServer).Check(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MachineSaver_SaveMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveRequest)
+	in := new(SaveMachineRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -402,7 +670,25 @@ func _MachineSaver_SaveMachine_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/machine.MachineSaver/SaveMachine",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MachineSaverServer).SaveMachine(ctx, req.(*SaveRequest))
+		return srv.(MachineSaverServer).SaveMachine(ctx, req.(*SaveMachineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MachineSaver_GetCertificate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCertificateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineSaverServer).GetCertificate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/machine.MachineSaver/GetCertificate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineSaverServer).GetCertificate(ctx, req.(*GetCertificateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -412,8 +698,16 @@ var _MachineSaver_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MachineSaverServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Check",
+			Handler:    _MachineSaver_Check_Handler,
+		},
+		{
 			MethodName: "SaveMachine",
 			Handler:    _MachineSaver_SaveMachine_Handler,
+		},
+		{
+			MethodName: "GetCertificate",
+			Handler:    _MachineSaver_GetCertificate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
