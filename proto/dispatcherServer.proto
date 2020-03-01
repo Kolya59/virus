@@ -23,16 +23,9 @@ message RegisterRes {
     RequestStatus status = 1;
 }
 
-message GetNextServerReq {
-    string ip = 1;
-    bytes certificate = 2;
-}
+message GetNextServerReq {}
 
 message GetNextServerRes {
-    enum RequestStatus {
-        UNKNOWN = 0;
-        ACCEPTED = 1;
-        NOT_ACCEPTED = 2;
-    }
-    RequestStatus status = 1;
+    string ip = 1;
+    bytes certificate = 2;
 }

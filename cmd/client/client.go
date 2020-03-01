@@ -7,9 +7,17 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/kolya59/virus/pkg/machine"
 	pb "github.com/kolya59/virus/proto"
+)
+
+const (
+	dispatcherCert = "worker_server.crt"
+	// TODO Fill it
+	dispatcherHost = ""
+	dispatcherPort = ""
 )
 
 var (
@@ -24,14 +32,21 @@ func sendData(machine machine.Machine, done chan interface{}) {
 	// Generate uuid
 	converted.Uuid = uuid.NewV4().String()
 
-	// TODO Get host and port
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", "host", "port"), grpc.WithInsecure(), grpc.WithBlock())
+	// Create the client TLS credentials
+	creds, err := credentials.NewServerTLSFromFile(dispatcherCert, "")
+	if err != nil {
+		return
+	}
+
+	// Set up a connection to the worker_server.
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		return
 	}
 	defer conn.Close()
-	c := pb.NewWorkerSaverClient(conn)
+
+	// Initialize the client
+	c := pb.NewServerWorkerClient(conn)
 
 	// Save cars
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
