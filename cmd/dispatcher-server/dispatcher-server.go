@@ -26,8 +26,12 @@ const (
 )
 
 type server struct {
-	rr    roundrobin.RoundRobin
+	rr    *roundrobin.RoundRobin
 	certs map[string][]byte
+}
+
+func newServer(rr *roundrobin.RoundRobin, certs map[string][]byte) *server {
+	return &server{rr: rr, certs: certs}
 }
 
 func (s *server) startServer(host, port string) {
@@ -92,9 +96,9 @@ func (s *server) GetNextServer(context.Context, *pb.GetNextServerReq) (*pb.GetNe
 		return nil, fmt.Errorf("failed to get next client")
 	}
 
-	return pb.GetNextServerRes{
+	return &pb.GetNextServerRes{
 		Ip:                   next.String(),
-		Certificate:          nil,
+		Certificate:          s.certs[next.String()],
 		XXX_NoUnkeyedLiteral: struct{}{},
 		XXX_unrecognized:     nil,
 		XXX_sizecache:        0,
@@ -103,6 +107,32 @@ func (s *server) GetNextServer(context.Context, *pb.GetNextServerReq) (*pb.GetNe
 
 func main() {
 	rr := roundrobin.NewRoundRobin(healthCheck)
+	m := make(map[string][]byte)
+
+	files, err := ioutil.ReadDir(storePath)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to restore old data")
+	}
+
+	for _, f := range files {
+		next, err := url.Parse(f.Name())
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to parse file: %v", f.Name())
+			continue
+		}
+
+		cert, err := ioutil.ReadFile(next.String())
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to parse file: %v", next.String())
+			continue
+		}
+
+		rr.Add(*next)
+		m[next.String()] = cert
+	}
+
+	srv := newServer(rr, m)
+	srv.startServer(host, port)
 }
 
 func healthCheck(target url.URL) bool {

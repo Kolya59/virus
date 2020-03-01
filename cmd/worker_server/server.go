@@ -78,7 +78,7 @@ func (s *server) startServer(host, port string) {
 	// Create the TLS credentials
 	creds, err := credentials.NewServerTLSFromFile(crt, key)
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not load TLS keys")
+		log.Fatal().Err(err).Msg("Failed to load TLS keys")
 	}
 
 	// Create the gRPC worker_server with the credentials
