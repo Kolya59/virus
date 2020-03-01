@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package pb;
+
+service FunctionDispatcher {
+    rpc Check(HealthCheckReq) returns (HealthCheckRes);
+    rpc GetTarget(GetTargetReq) returns (GetTargetRes);
+}
+
+message GetTargetReq {
+    bytes uuid = 1;
+}
+
+message GetTargetRes {
+    string ip = 1;
+    bytes certificate = 2;
+}
