@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -10,12 +11,6 @@ import (
 
 	"github.com/kolya59/virus/pkg/pubsub"
 	pb "github.com/kolya59/virus/proto"
-)
-
-// TODO Take out
-const (
-	projectID = "trrp-virus"
-	topicName = "machines"
 )
 
 var saveTimeout = 5 * time.Second
@@ -65,6 +60,18 @@ func convertData(raw pb.Machine) map[string]interface{} {
 }
 
 func main() {
+	// Get project ID from ENV
+	projectID := os.Getenv("PROJECT_ID")
+	if projectID == "" {
+		projectID = "trrp-virus"
+	}
+
+	// Get topic name from ENV
+	topicName := os.Getenv("TOPIC")
+	if topicName == "" {
+		topicName = "machines"
+	}
+
 	srv := server{}
 
 	// Get a Firestore firestore.

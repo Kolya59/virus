@@ -14,12 +14,6 @@ import (
 	pb "github.com/kolya59/virus/proto"
 )
 
-// TODO Take out
-const (
-	projectID = "trrp-virus"
-	topicName = "machines"
-)
-
 type server struct {
 	client *pubsub.Client
 }
@@ -46,6 +40,18 @@ func (s server) Check(context.Context, *pb.HealthCheckReq) (*pb.HealthCheckRes, 
 }
 
 func main() {
+	// Get project ID from ENV
+	projectID := os.Getenv("PROJECT_ID")
+	if projectID == "" {
+		projectID = "trrp-virus"
+	}
+
+	// Get topic name from ENV
+	topicName := os.Getenv("TOPIC")
+	if topicName == "" {
+		topicName = "machines"
+	}
+
 	// Get port from ENV
 	port := os.Getenv("PORT")
 	if port == "" {
