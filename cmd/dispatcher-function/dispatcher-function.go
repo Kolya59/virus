@@ -5,43 +5,44 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 
+	"github.com/kolya59/virus/pkg/pubsub"
 	pb "github.com/kolya59/virus/proto"
 )
 
+// TODO Take out
 const (
-	dispatcherServerHost = "127.0.0.1"
-	dispatcherServerPort = "8081"
-)
-
-var (
-	getNextServerTimeout = 5 * time.Second
+	projectID = "trrp-virus"
+	topicName = "machines"
 )
 
 type server struct {
-	dispatcherServerClient pb.ServerDispatcherClient
+	client *pubsub.Client
+}
+
+func (s server) SaveMachine(ctx context.Context, req *pb.SaveMachineReq) (*pb.SaveMachineRes, error) {
+	// Unmarshal Machine from gRPC msg to raw bytes
+	data, err := proto.Marshal(req.Machine)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal msg")
+		return nil, err
+	}
+
+	// Publish raw bytes to pubsub
+	if err := s.client.Publish(ctx, data); err != nil {
+		log.Error().Err(err).Msg("Failed to publish msg")
+		return nil, err
+	}
+
+	return &pb.SaveMachineRes{Status: pb.SaveMachineRes_ACCEPTED}, nil
 }
 
 func (s server) Check(context.Context, *pb.HealthCheckReq) (*pb.HealthCheckRes, error) {
 	return &pb.HealthCheckRes{Status: pb.HealthCheckRes_SERVING}, nil
-}
-
-func (s server) GetTarget(ctx context.Context, req *pb.GetTargetReq) (*pb.GetTargetRes, error) {
-	ctx, cancel := context.WithTimeout(ctx, getNextServerTimeout)
-	defer cancel()
-	res, err := s.dispatcherServerClient.GetNextServer(ctx, &pb.GetNextServerReq{})
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to get next server")
-		return nil, err
-	}
-	return &pb.GetTargetRes{
-		Ip:          res.Ip,
-		Certificate: res.Certificate,
-	}, nil
 }
 
 func main() {
@@ -67,16 +68,12 @@ func main() {
 	srv := grpc.NewServer()
 	// TODO srv := grpc.NewServer(grpc.Creds(creds))
 
-	// TODO Set up a connection to the worker-server.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherServerHost, dispatcherServerPort), grpc.WithInsecure())
+	psClient, err := pubsub.NewClient(projectID, topicName)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to dial dispatcher server")
+		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}
-	defer conn.Close()
 
-	// Initialize the client
-	c := pb.NewServerDispatcherClient(conn)
-	s := server{c}
+	s := server{client: psClient}
 
 	// Register the handler object
 	pb.RegisterFunctionDispatcherServer(srv, s)

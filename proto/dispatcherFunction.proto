@@ -1,19 +1,24 @@
 syntax = "proto3";
 
 import "common.proto";
+import "machine.proto";
 
 package pb;
 
 service FunctionDispatcher {
     rpc Check(HealthCheckReq) returns (HealthCheckRes);
-    rpc GetTarget(GetTargetReq) returns (GetTargetRes);
+    rpc SaveMachine(SaveMachineReq) returns (SaveMachineRes);
 }
 
-message GetTargetReq {
-    bytes uuid = 1;
+message SaveMachineReq {
+    Machine machine = 1;
 }
 
-message GetTargetRes {
-    string ip = 1;
-    bytes certificate = 2;
+message SaveMachineRes {
+    enum RequestStatus {
+        UNKNOWN = 0;
+        ACCEPTED = 1;
+        NOT_ACCEPTED = 2;
+    }
+    RequestStatus status = 1;
 }

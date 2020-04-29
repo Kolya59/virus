@@ -4,13 +4,15 @@
 package pb
 
 import (
-	context "context"
 	fmt "fmt"
+
 	proto "github.com/golang/protobuf/proto"
-	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+
 	math "math"
+
+	context "golang.org/x/net/context"
+
+	grpc "google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -22,115 +24,114 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type GetTargetReq struct {
-	Uuid                 []byte   `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+type SaveMachineRes_RequestStatus int32
+
+const (
+	SaveMachineRes_UNKNOWN      SaveMachineRes_RequestStatus = 0
+	SaveMachineRes_ACCEPTED     SaveMachineRes_RequestStatus = 1
+	SaveMachineRes_NOT_ACCEPTED SaveMachineRes_RequestStatus = 2
+)
+
+var SaveMachineRes_RequestStatus_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "ACCEPTED",
+	2: "NOT_ACCEPTED",
+}
+var SaveMachineRes_RequestStatus_value = map[string]int32{
+	"UNKNOWN":      0,
+	"ACCEPTED":     1,
+	"NOT_ACCEPTED": 2,
+}
+
+func (x SaveMachineRes_RequestStatus) String() string {
+	return proto.EnumName(SaveMachineRes_RequestStatus_name, int32(x))
+}
+func (SaveMachineRes_RequestStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_dispatcherFunction_a14e2a7d8b831951, []int{1, 0}
+}
+
+type SaveMachineReq struct {
+	Machine              *Machine `protobuf:"bytes,1,opt,name=machine,proto3" json:"machine,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetTargetReq) Reset()         { *m = GetTargetReq{} }
-func (m *GetTargetReq) String() string { return proto.CompactTextString(m) }
-func (*GetTargetReq) ProtoMessage()    {}
-func (*GetTargetReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9007b02db7f1f7a1, []int{0}
+func (m *SaveMachineReq) Reset()         { *m = SaveMachineReq{} }
+func (m *SaveMachineReq) String() string { return proto.CompactTextString(m) }
+func (*SaveMachineReq) ProtoMessage()    {}
+func (*SaveMachineReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dispatcherFunction_a14e2a7d8b831951, []int{0}
+}
+func (m *SaveMachineReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SaveMachineReq.Unmarshal(m, b)
+}
+func (m *SaveMachineReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SaveMachineReq.Marshal(b, m, deterministic)
+}
+func (dst *SaveMachineReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SaveMachineReq.Merge(dst, src)
+}
+func (m *SaveMachineReq) XXX_Size() int {
+	return xxx_messageInfo_SaveMachineReq.Size(m)
+}
+func (m *SaveMachineReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_SaveMachineReq.DiscardUnknown(m)
 }
 
-func (m *GetTargetReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetTargetReq.Unmarshal(m, b)
-}
-func (m *GetTargetReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetTargetReq.Marshal(b, m, deterministic)
-}
-func (m *GetTargetReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTargetReq.Merge(m, src)
-}
-func (m *GetTargetReq) XXX_Size() int {
-	return xxx_messageInfo_GetTargetReq.Size(m)
-}
-func (m *GetTargetReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetTargetReq.DiscardUnknown(m)
-}
+var xxx_messageInfo_SaveMachineReq proto.InternalMessageInfo
 
-var xxx_messageInfo_GetTargetReq proto.InternalMessageInfo
-
-func (m *GetTargetReq) GetUuid() []byte {
+func (m *SaveMachineReq) GetMachine() *Machine {
 	if m != nil {
-		return m.Uuid
+		return m.Machine
 	}
 	return nil
 }
 
-type GetTargetRes struct {
-	Ip                   string   `protobuf:"bytes,1,opt,name=ip,proto3" json:"ip,omitempty"`
-	Certificate          []byte   `protobuf:"bytes,2,opt,name=certificate,proto3" json:"certificate,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type SaveMachineRes struct {
+	Status               SaveMachineRes_RequestStatus `protobuf:"varint,1,opt,name=status,proto3,enum=pb.SaveMachineRes_RequestStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
 }
 
-func (m *GetTargetRes) Reset()         { *m = GetTargetRes{} }
-func (m *GetTargetRes) String() string { return proto.CompactTextString(m) }
-func (*GetTargetRes) ProtoMessage()    {}
-func (*GetTargetRes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9007b02db7f1f7a1, []int{1}
+func (m *SaveMachineRes) Reset()         { *m = SaveMachineRes{} }
+func (m *SaveMachineRes) String() string { return proto.CompactTextString(m) }
+func (*SaveMachineRes) ProtoMessage()    {}
+func (*SaveMachineRes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dispatcherFunction_a14e2a7d8b831951, []int{1}
+}
+func (m *SaveMachineRes) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SaveMachineRes.Unmarshal(m, b)
+}
+func (m *SaveMachineRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SaveMachineRes.Marshal(b, m, deterministic)
+}
+func (dst *SaveMachineRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SaveMachineRes.Merge(dst, src)
+}
+func (m *SaveMachineRes) XXX_Size() int {
+	return xxx_messageInfo_SaveMachineRes.Size(m)
+}
+func (m *SaveMachineRes) XXX_DiscardUnknown() {
+	xxx_messageInfo_SaveMachineRes.DiscardUnknown(m)
 }
 
-func (m *GetTargetRes) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetTargetRes.Unmarshal(m, b)
-}
-func (m *GetTargetRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetTargetRes.Marshal(b, m, deterministic)
-}
-func (m *GetTargetRes) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTargetRes.Merge(m, src)
-}
-func (m *GetTargetRes) XXX_Size() int {
-	return xxx_messageInfo_GetTargetRes.Size(m)
-}
-func (m *GetTargetRes) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetTargetRes.DiscardUnknown(m)
-}
+var xxx_messageInfo_SaveMachineRes proto.InternalMessageInfo
 
-var xxx_messageInfo_GetTargetRes proto.InternalMessageInfo
-
-func (m *GetTargetRes) GetIp() string {
+func (m *SaveMachineRes) GetStatus() SaveMachineRes_RequestStatus {
 	if m != nil {
-		return m.Ip
+		return m.Status
 	}
-	return ""
-}
-
-func (m *GetTargetRes) GetCertificate() []byte {
-	if m != nil {
-		return m.Certificate
-	}
-	return nil
+	return SaveMachineRes_UNKNOWN
 }
 
 func init() {
-	proto.RegisterType((*GetTargetReq)(nil), "pb.GetTargetReq")
-	proto.RegisterType((*GetTargetRes)(nil), "pb.GetTargetRes")
-}
-
-func init() { proto.RegisterFile("dispatcherFunction.proto", fileDescriptor_9007b02db7f1f7a1) }
-
-var fileDescriptor_9007b02db7f1f7a1 = []byte{
-	// 192 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x8f, 0xc1, 0x6a, 0x83, 0x40,
-	0x10, 0x86, 0x71, 0x69, 0x0b, 0x4e, 0xa5, 0x94, 0x39, 0x89, 0x27, 0xf1, 0xd4, 0x93, 0x42, 0xfb,
-	0x02, 0x85, 0x96, 0xb6, 0xe7, 0xa5, 0x2f, 0xb0, 0xae, 0x93, 0xb8, 0x24, 0xba, 0xeb, 0xee, 0x98,
-	0xe7, 0x0f, 0x59, 0x50, 0x4c, 0x72, 0x1b, 0x3e, 0xbe, 0x81, 0xef, 0x87, 0xbc, 0x33, 0xc1, 0x29,
-	0xd6, 0x3d, 0xf9, 0x9f, 0x79, 0xd4, 0x6c, 0xec, 0x58, 0x3b, 0x6f, 0xd9, 0xa2, 0x70, 0x6d, 0x91,
-	0x69, 0x3b, 0x0c, 0x0b, 0xa9, 0x2a, 0xc8, 0x7e, 0x89, 0xff, 0x95, 0xdf, 0x13, 0x4b, 0x9a, 0x10,
-	0xe1, 0x61, 0x9e, 0x4d, 0x97, 0x27, 0x65, 0xf2, 0x96, 0xc9, 0x78, 0x57, 0x9f, 0x57, 0x4e, 0xc0,
-	0x17, 0x10, 0xc6, 0x45, 0x23, 0x95, 0xc2, 0x38, 0x2c, 0xe1, 0x59, 0x93, 0x67, 0xb3, 0x33, 0x5a,
-	0x31, 0xe5, 0x22, 0xbe, 0x6e, 0xd1, 0xfb, 0x09, 0x70, 0x29, 0xf9, 0x5e, 0xdb, 0xb0, 0x81, 0xc7,
-	0xaf, 0x9e, 0xf4, 0x01, 0xb1, 0x76, 0x6d, 0xfd, 0x47, 0xea, 0xc8, 0x7d, 0x04, 0x92, 0xa6, 0xe2,
-	0x9e, 0x05, 0x6c, 0x20, 0x5d, 0x43, 0xf0, 0xf5, 0x22, 0x6c, 0xdb, 0x8b, 0x5b, 0x12, 0xda, 0xa7,
-	0x38, 0xf2, 0xe3, 0x1c, 0x00, 0x00, 0xff, 0xff, 0x7f, 0x10, 0xeb, 0x71, 0x12, 0x01, 0x00, 0x00,
+	proto.RegisterType((*SaveMachineReq)(nil), "pb.SaveMachineReq")
+	proto.RegisterType((*SaveMachineRes)(nil), "pb.SaveMachineRes")
+	proto.RegisterEnum("pb.SaveMachineRes_RequestStatus", SaveMachineRes_RequestStatus_name, SaveMachineRes_RequestStatus_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -146,7 +147,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type FunctionDispatcherClient interface {
 	Check(ctx context.Context, in *HealthCheckReq, opts ...grpc.CallOption) (*HealthCheckRes, error)
-	GetTarget(ctx context.Context, in *GetTargetReq, opts ...grpc.CallOption) (*GetTargetRes, error)
+	SaveMachine(ctx context.Context, in *SaveMachineReq, opts ...grpc.CallOption) (*SaveMachineRes, error)
 }
 
 type functionDispatcherClient struct {
@@ -166,9 +167,9 @@ func (c *functionDispatcherClient) Check(ctx context.Context, in *HealthCheckReq
 	return out, nil
 }
 
-func (c *functionDispatcherClient) GetTarget(ctx context.Context, in *GetTargetReq, opts ...grpc.CallOption) (*GetTargetRes, error) {
-	out := new(GetTargetRes)
-	err := c.cc.Invoke(ctx, "/pb.FunctionDispatcher/GetTarget", in, out, opts...)
+func (c *functionDispatcherClient) SaveMachine(ctx context.Context, in *SaveMachineReq, opts ...grpc.CallOption) (*SaveMachineRes, error) {
+	out := new(SaveMachineRes)
+	err := c.cc.Invoke(ctx, "/pb.FunctionDispatcher/saveMachine", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -178,18 +179,7 @@ func (c *functionDispatcherClient) GetTarget(ctx context.Context, in *GetTargetR
 // FunctionDispatcherServer is the server API for FunctionDispatcher service.
 type FunctionDispatcherServer interface {
 	Check(context.Context, *HealthCheckReq) (*HealthCheckRes, error)
-	GetTarget(context.Context, *GetTargetReq) (*GetTargetRes, error)
-}
-
-// UnimplementedFunctionDispatcherServer can be embedded to have forward compatible implementations.
-type UnimplementedFunctionDispatcherServer struct {
-}
-
-func (*UnimplementedFunctionDispatcherServer) Check(ctx context.Context, req *HealthCheckReq) (*HealthCheckRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
-}
-func (*UnimplementedFunctionDispatcherServer) GetTarget(ctx context.Context, req *GetTargetReq) (*GetTargetRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTarget not implemented")
+	SaveMachine(context.Context, *SaveMachineReq) (*SaveMachineRes, error)
 }
 
 func RegisterFunctionDispatcherServer(s *grpc.Server, srv FunctionDispatcherServer) {
@@ -214,20 +204,20 @@ func _FunctionDispatcher_Check_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FunctionDispatcher_GetTarget_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTargetReq)
+func _FunctionDispatcher_SaveMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveMachineReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FunctionDispatcherServer).GetTarget(ctx, in)
+		return srv.(FunctionDispatcherServer).SaveMachine(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.FunctionDispatcher/GetTarget",
+		FullMethod: "/pb.FunctionDispatcher/saveMachine",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FunctionDispatcherServer).GetTarget(ctx, req.(*GetTargetReq))
+		return srv.(FunctionDispatcherServer).SaveMachine(ctx, req.(*SaveMachineReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -241,10 +231,34 @@ var _FunctionDispatcher_serviceDesc = grpc.ServiceDesc{
 			Handler:    _FunctionDispatcher_Check_Handler,
 		},
 		{
-			MethodName: "GetTarget",
-			Handler:    _FunctionDispatcher_GetTarget_Handler,
+			MethodName: "saveMachine",
+			Handler:    _FunctionDispatcher_SaveMachine_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "dispatcherFunction.proto",
+}
+
+func init() {
+	proto.RegisterFile("dispatcherFunction.proto", fileDescriptor_dispatcherFunction_a14e2a7d8b831951)
+}
+
+var fileDescriptor_dispatcherFunction_a14e2a7d8b831951 = []byte{
+	// 250 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x48, 0xc9, 0x2c, 0x2e,
+	0x48, 0x2c, 0x49, 0xce, 0x48, 0x2d, 0x72, 0x2b, 0xcd, 0x4b, 0x2e, 0xc9, 0xcc, 0xcf, 0xd3, 0x2b,
+	0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2a, 0x48, 0x92, 0xe2, 0x49, 0xce, 0xcf, 0xcd, 0x85, 0x89,
+	0x48, 0xf1, 0xe6, 0x26, 0x26, 0x67, 0x64, 0xe6, 0xa5, 0x42, 0xb8, 0x4a, 0xe6, 0x5c, 0x7c, 0xc1,
+	0x89, 0x65, 0xa9, 0xbe, 0x10, 0xc1, 0xa0, 0xd4, 0x42, 0x21, 0x55, 0x2e, 0x76, 0xa8, 0x12, 0x09,
+	0x46, 0x05, 0x46, 0x0d, 0x6e, 0x23, 0x6e, 0xbd, 0x82, 0x24, 0x3d, 0x98, 0x02, 0x98, 0x9c, 0x52,
+	0x07, 0x23, 0x9a, 0xce, 0x62, 0x21, 0x0b, 0x2e, 0xb6, 0xe2, 0x92, 0xc4, 0x92, 0xd2, 0x62, 0xb0,
+	0x46, 0x3e, 0x23, 0x05, 0x90, 0x46, 0x54, 0x35, 0x7a, 0x41, 0xa9, 0x85, 0xa5, 0xa9, 0xc5, 0x25,
+	0xc1, 0x60, 0x75, 0x41, 0x50, 0xf5, 0x4a, 0x36, 0x5c, 0xbc, 0x28, 0x12, 0x42, 0xdc, 0x5c, 0xec,
+	0xa1, 0x7e, 0xde, 0x7e, 0xfe, 0xe1, 0x7e, 0x02, 0x0c, 0x42, 0x3c, 0x5c, 0x1c, 0x8e, 0xce, 0xce,
+	0xae, 0x01, 0x21, 0xae, 0x2e, 0x02, 0x8c, 0x42, 0x02, 0x5c, 0x3c, 0x7e, 0xfe, 0x21, 0xf1, 0x70,
+	0x11, 0x26, 0xa3, 0x1a, 0x2e, 0x21, 0x98, 0xb7, 0x5d, 0xe0, 0x01, 0x21, 0xa4, 0xcf, 0xc5, 0xea,
+	0x9c, 0x91, 0x9a, 0x9c, 0x2d, 0x24, 0x04, 0x72, 0x86, 0x47, 0x6a, 0x62, 0x4e, 0x49, 0x06, 0x58,
+	0x20, 0x28, 0xb5, 0x50, 0x0a, 0x53, 0xac, 0x58, 0xc8, 0x94, 0x8b, 0x1b, 0xc9, 0xb1, 0x10, 0x6d,
+	0xa8, 0x61, 0x23, 0x85, 0x29, 0x56, 0x9c, 0xc4, 0x06, 0x0e, 0x48, 0x63, 0x40, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0xbd, 0xec, 0xc8, 0x8b, 0x85, 0x01, 0x00, 0x00,
 }

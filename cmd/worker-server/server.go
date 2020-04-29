@@ -2,154 +2,89 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
-	"net"
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/golang/protobuf/proto"
 	"github.com/rs/zerolog/log"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 
+	"github.com/kolya59/virus/pkg/pubsub"
 	pb "github.com/kolya59/virus/proto"
 )
 
+// TODO Take out
 const (
-	// TODO Fill it
-	port           = ""
-	dispatcherHost = ""
-	dispatcherPort = ""
-	projectID      = "trrp-virus"
+	projectID = "trrp-virus"
+	topicName = "machines"
 )
 
-var (
-	crt           = "server.crt"
-	key           = "server.key"
-	dispatcherCrt = "dispatcher.crt"
-	interval      = 5 * time.Minute
-	timeout       = 60 * time.Minute
-	saveTimeout   = 5 * time.Second
-)
+var saveTimeout = 5 * time.Second
 
 type server struct {
-	client *firestore.Client
+	firestore *firestore.Client
+	pubsub    *pubsub.Client
 }
 
-func (s *server) register(done chan interface{}) {
-	// Create the client TLS credentials
-	creds, err := credentials.NewServerTLSFromFile(dispatcherCrt, "")
-	if err != nil {
-		return
+// handleMsg handles messages from pubsub and pass it to firestore
+func (s *server) handleMsg(ctx context.Context, data []byte) error {
+	// Unmarshal data from pubsub to Machine
+	var msg pb.Machine
+	if err := proto.Unmarshal(data, &msg); err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal msg")
+		return err
 	}
 
-	// Set up a connection to the worker-server.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithTransportCredentials(creds))
-	if err != nil {
-		return
-	}
-	defer conn.Close()
-
-	// Initialize the client
-	c := pb.NewServerDispatcherClient(conn)
-
-	// Read cert
-	cert, err := ioutil.ReadFile(crt)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to read crt")
+	// Save Machine to firestore
+	if err := s.saveMachine(ctx, msg); err != nil {
+		log.Error().Err(err).Msg("Failed to save machine")
+		return err
 	}
 
-	// Register
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	r, err := c.Register(ctx, &pb.RegisterReq{Certificate: cert})
-	if err != nil {
-		return
-	}
-
-	if r.Status != pb.RegisterRes_REGISTERED {
-		close(done)
-	}
+	return nil
 }
 
-func (s *server) startServer(port string) {
-	// Create the channel to listen on
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to listen")
-	}
-
-	// Create the TLS credentials
-	creds, err := credentials.NewServerTLSFromFile(crt, key)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load TLS keys")
-	}
-
-	// Create the gRPC worker-server with the credentials
-	srv := grpc.NewServer(grpc.Creds(creds))
-
-	// Register the handler object
-	pb.RegisterServerWorkerServer(srv, s)
-
-	// Serve and Listen
-	if err := srv.Serve(lis); err != nil {
-		log.Fatal().Err(err).Msg("Failed to serve")
-	}
-}
-
-func (s *server) Check(context.Context, *pb.HealthCheckReq) (*pb.HealthCheckRes, error) {
-	return &pb.HealthCheckRes{Status: pb.HealthCheckRes_SERVING}, nil
-}
-
-func (s *server) SaveMachine(ctx context.Context, data *pb.SaveMachineReq) (*pb.SaveMachineRes, error) {
+// saveMachine saves machine's to firestore
+func (s *server) saveMachine(ctx context.Context, data pb.Machine) error {
 	converted := convertData(data)
 
 	ctx, cancel := context.WithTimeout(ctx, saveTimeout)
 	defer cancel()
-	if _, _, err := s.client.Collection("users").Add(ctx, converted); err != nil {
-		log.Error().Err(err).Msg("Failed adding msg")
-		return nil, err
+	if _, _, err := s.firestore.Collection("users").Add(ctx, converted); err != nil {
+		return err
 	}
 
-	return &pb.SaveMachineRes{Status: pb.SaveMachineRes_ACCEPTED}, nil
+	return nil
 }
 
-func convertData(raw *pb.SaveMachineReq) map[string]interface{} {
+// convertData converts pb.Machine to map
+func convertData(raw pb.Machine) map[string]interface{} {
 	res := make(map[string]interface{})
 	// TODO Check
-	res["machine"] = raw.Machine
+	res["machine"] = raw
 	return res
 }
 
 func main() {
 	srv := server{}
 
-	done := make(chan interface{})
-	ticker := time.NewTicker(interval)
-	timer := time.NewTimer(timeout)
-
-loop:
-	for {
-		select {
-		case <-ticker.C:
-			srv.register(done)
-		case <-timer.C:
-			log.Fatal().Msgf("Register time is out")
-		case <-done:
-			break loop
-		}
-	}
-
-	// Get a Firestore client.
+	// Get a Firestore firestore.
 	ctx := context.Background()
 	var err error
-	srv.client, err = firestore.NewClient(ctx, projectID)
+	srv.firestore, err = firestore.NewClient(ctx, projectID)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create client")
+		log.Fatal().Err(err).Msg("Failed to create firestore")
+	}
+	// Close firestore when done.
+	defer srv.firestore.Close()
+
+	// Initialize pubsub client
+	srv.pubsub, err = pubsub.NewClient(projectID, topicName)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}
 
-	// Close client when done.
-	defer srv.client.Close()
-
-	srv.startServer(port)
+	// Start to listen events
+	if err := srv.pubsub.Consume(ctx, srv.handleMsg); err != nil {
+		log.Fatal().Err(err).Msg("Failed to handle msgs")
+	}
 }

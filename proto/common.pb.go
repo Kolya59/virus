@@ -3,11 +3,9 @@
 
 package pb
 
-import (
-	fmt "fmt"
-	proto "github.com/golang/protobuf/proto"
-	math "math"
-)
+import proto "github.com/golang/protobuf/proto"
+import fmt "fmt"
+import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -18,7 +16,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type HealthCheckRes_ServingStatus int32
 
@@ -33,7 +31,6 @@ var HealthCheckRes_ServingStatus_name = map[int32]string{
 	1: "SERVING",
 	2: "NOT_SERVING",
 }
-
 var HealthCheckRes_ServingStatus_value = map[string]int32{
 	"UNKNOWN":     0,
 	"SERVING":     1,
@@ -43,9 +40,8 @@ var HealthCheckRes_ServingStatus_value = map[string]int32{
 func (x HealthCheckRes_ServingStatus) String() string {
 	return proto.EnumName(HealthCheckRes_ServingStatus_name, int32(x))
 }
-
 func (HealthCheckRes_ServingStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_555bd8c177793206, []int{1, 0}
+	return fileDescriptor_common_065fa8a05e110f9a, []int{1, 0}
 }
 
 type HealthCheckReq struct {
@@ -58,17 +54,16 @@ func (m *HealthCheckReq) Reset()         { *m = HealthCheckReq{} }
 func (m *HealthCheckReq) String() string { return proto.CompactTextString(m) }
 func (*HealthCheckReq) ProtoMessage()    {}
 func (*HealthCheckReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_555bd8c177793206, []int{0}
+	return fileDescriptor_common_065fa8a05e110f9a, []int{0}
 }
-
 func (m *HealthCheckReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HealthCheckReq.Unmarshal(m, b)
 }
 func (m *HealthCheckReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_HealthCheckReq.Marshal(b, m, deterministic)
 }
-func (m *HealthCheckReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HealthCheckReq.Merge(m, src)
+func (dst *HealthCheckReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckReq.Merge(dst, src)
 }
 func (m *HealthCheckReq) XXX_Size() int {
 	return xxx_messageInfo_HealthCheckReq.Size(m)
@@ -90,17 +85,16 @@ func (m *HealthCheckRes) Reset()         { *m = HealthCheckRes{} }
 func (m *HealthCheckRes) String() string { return proto.CompactTextString(m) }
 func (*HealthCheckRes) ProtoMessage()    {}
 func (*HealthCheckRes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_555bd8c177793206, []int{1}
+	return fileDescriptor_common_065fa8a05e110f9a, []int{1}
 }
-
 func (m *HealthCheckRes) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HealthCheckRes.Unmarshal(m, b)
 }
 func (m *HealthCheckRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_HealthCheckRes.Marshal(b, m, deterministic)
 }
-func (m *HealthCheckRes) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HealthCheckRes.Merge(m, src)
+func (dst *HealthCheckRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HealthCheckRes.Merge(dst, src)
 }
 func (m *HealthCheckRes) XXX_Size() int {
 	return xxx_messageInfo_HealthCheckRes.Size(m)
@@ -119,14 +113,14 @@ func (m *HealthCheckRes) GetStatus() HealthCheckRes_ServingStatus {
 }
 
 func init() {
-	proto.RegisterEnum("pb.HealthCheckRes_ServingStatus", HealthCheckRes_ServingStatus_name, HealthCheckRes_ServingStatus_value)
 	proto.RegisterType((*HealthCheckReq)(nil), "pb.HealthCheckReq")
 	proto.RegisterType((*HealthCheckRes)(nil), "pb.HealthCheckRes")
+	proto.RegisterEnum("pb.HealthCheckRes_ServingStatus", HealthCheckRes_ServingStatus_name, HealthCheckRes_ServingStatus_value)
 }
 
-func init() { proto.RegisterFile("common.proto", fileDescriptor_555bd8c177793206) }
+func init() { proto.RegisterFile("common.proto", fileDescriptor_common_065fa8a05e110f9a) }
 
-var fileDescriptor_555bd8c177793206 = []byte{
+var fileDescriptor_common_065fa8a05e110f9a = []byte{
 	// 150 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0xce, 0xcf, 0xcd,
 	0xcd, 0xcf, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2a, 0x48, 0x52, 0x12, 0xe0, 0xe2,
