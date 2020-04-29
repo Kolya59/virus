@@ -55,8 +55,10 @@ func main() {
 	// Get sub name from ENV
 	subName := os.Getenv("SUB")
 	if topicName == "" {
-		topicName = "machines"
+		topicName = "machines-sub"
 	}
+
+	log.Info().Msgf("ProjectID: %v Topic: %v Sub: %v", projectID, topicName, subName)
 
 	// Get port from ENV
 	port := os.Getenv("PORT")
@@ -90,6 +92,7 @@ func main() {
 	// Register the handler object
 	pb.RegisterFunctionDispatcherServer(srv, s)
 
+	log.Info().Msg("Start to serve")
 	// Serve and Listen
 	if err := srv.Serve(lis); err != nil {
 		log.Fatal().Err(err).Msg("Failed to serve")

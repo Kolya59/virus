@@ -39,7 +39,7 @@ func NewClient(projectID, topicName, subName string) (*Client, error) {
 	}
 
 	// Create subscription if it doesn't exists
-	sub := client.Subscription(topicName)
+	sub := client.Subscription(subName)
 	exists, err = sub.Exists(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check sub existense: %v", err)
@@ -49,7 +49,7 @@ func NewClient(projectID, topicName, subName string) (*Client, error) {
 			Topic:       topic,
 			AckDeadline: publishTimeout,
 		}); err != nil {
-			return nil, fmt.Errorf("failed to create sub")
+			return nil, fmt.Errorf("failed to create sub: %v", err)
 		}
 	}
 

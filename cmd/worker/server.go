@@ -75,8 +75,10 @@ func main() {
 	// Get sub name from ENV
 	subName := os.Getenv("SUB")
 	if topicName == "" {
-		topicName = "machines"
+		topicName = "machines-sub"
 	}
+
+	log.Info().Msgf("ProjectID: %v Topic: %v Sub: %v", projectID, topicName, subName)
 
 	srv := server{}
 
@@ -96,6 +98,7 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}
 
+	log.Info().Msg("Start to consume")
 	// Start to listen events
 	if err := srv.pubsub.Consume(ctx, srv.handleMsg); err != nil {
 		log.Fatal().Err(err).Msg("Failed to handle msgs")
