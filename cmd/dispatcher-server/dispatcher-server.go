@@ -47,7 +47,7 @@ func (s *server) startServer(host, port string) {
 		log.Fatal().Err(err).Msg("could not load TLS keys")
 	}
 
-	// Create the gRPC worker_server with the credentials
+	// Create the gRPC dispatcher-server with the credentials
 	srv := grpc.NewServer(grpc.Creds(creds))
 
 	// Register the handler object

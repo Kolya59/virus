@@ -90,7 +90,6 @@ func (m *Machine) GetIPS() {
 			m.Ifaces[i].Err = err
 			continue
 		}
-		// TODO Refactor this fucking spaghetti trash
 		var extendedAddresses []Address
 		for _, addr := range addrs {
 			var ip net.IP

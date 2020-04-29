@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	dispatcherCert = "worker_server.crt"
+	dispatcherCert = "worker-server.crt"
 	// TODO Fill it
 	dispatcherHost = ""
 	dispatcherPort = ""
@@ -38,7 +38,7 @@ func sendData(machine machine.Machine, done chan interface{}) {
 		return
 	}
 
-	// Set up a connection to the worker_server.
+	// Set up a connection to the worker-server.
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithTransportCredentials(creds))
 	if err != nil {
 		return
