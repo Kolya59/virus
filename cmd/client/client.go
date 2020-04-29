@@ -5,19 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 
 	"github.com/kolya59/virus/pkg/machine"
 	pb "github.com/kolya59/virus/proto"
 )
 
 const (
-	dispatcherCert = "worker-server.crt"
-	// TODO Fill it
-	dispatcherHost = ""
-	dispatcherPort = ""
+	dispatcherCert = "worker.crt"
+	dispatcherHost = "dispatcher-server-eujhpoji7a-ew.a.run.app"
+	dispatcherPort = "8080"
 )
 
 var (
@@ -29,27 +26,24 @@ func sendData(machine machine.Machine, done chan interface{}) {
 	// Convert to grpc
 	converted := machine.ToGRPC()
 
-	// Generate uuid
-	converted.Uuid = uuid.NewV4().String()
-
-	// Create the client TLS credentials
+	/*// Create the client TLS credentials
 	creds, err := credentials.NewServerTLSFromFile(dispatcherCert, "")
 	if err != nil {
 		return
-	}
+	}*/
 
-	// Set up a connection to the worker-server.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithTransportCredentials(creds))
+	// Set up a connection to the worker.
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithInsecure())
 	if err != nil {
 		return
 	}
 	defer conn.Close()
 
 	// Initialize the client
-	c := pb.NewServerWorkerClient(conn)
+	c := pb.NewFunctionDispatcherClient(conn)
 
 	// Save cars
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	r, err := c.SaveMachine(ctx, &pb.SaveMachineReq{Machine: converted})
 	if err != nil {
@@ -63,13 +57,14 @@ func sendData(machine machine.Machine, done chan interface{}) {
 
 func main() {
 	m := machine.Machine{}
-	m.GetIPS()
+	// m.GetIPS()
 
 	done := make(chan interface{})
-	ticker := time.NewTicker(interval)
-	timer := time.NewTimer(timeout)
+	/*ticker := time.NewTicker(interval)
+	timer := time.NewTimer(timeout)*/
 
-	for {
+	sendData(m, done)
+	/*for {
 		select {
 		case <-ticker.C:
 			sendData(m, done)
@@ -78,5 +73,5 @@ func main() {
 		case <-done:
 			return
 		}
-	}
+	}*/
 }

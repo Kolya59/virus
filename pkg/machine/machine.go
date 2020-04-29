@@ -120,13 +120,13 @@ func (m *Machine) GetIPS() {
 func (m *Machine) ToGRPC() *machine.Machine {
 	converted := &machine.Machine{}
 	if m.Err != nil {
+		converted.Error = m.Err.Error()
+	} else {
 		ifaces := make([]*machine.Iface, len(m.Ifaces))
 		for i, iface := range m.Ifaces {
 			ifaces[i] = iface.ToGRPC()
 		}
 		converted.Ifaces = ifaces
-	} else {
-		converted.Error = m.Err.Error()
 	}
 
 	return converted

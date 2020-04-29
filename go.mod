@@ -20,12 +20,12 @@ require (
 	github.com/mwitkow/go-proto-validators v0.3.0 // indirect
 	github.com/pseudomuto/protoc-gen-doc v1.3.1 // indirect
 	github.com/rs/zerolog v1.17.2
-	github.com/satori/go.uuid v1.2.0
+	github.com/satori/go.uuid v1.2.0 // indirect
 	go.opencensus.io v0.22.3 // indirect
 	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79 // indirect
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/sys v0.0.0-20191220142924-d4481acd189f // indirect
-	google.golang.org/api v0.22.0
+	google.golang.org/api v0.22.0 // indirect
 	google.golang.org/genproto v0.0.0-20200429120912-1f37eeb960b2 // indirect
 	google.golang.org/grpc v1.27.0
 )

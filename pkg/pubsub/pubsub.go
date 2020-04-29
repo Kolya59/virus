@@ -17,7 +17,7 @@ type Client struct {
 	sub   *pubsub.Subscription
 }
 
-func NewClient(projectID, topicName string) (*Client, error) {
+func NewClient(projectID, topicName, subName string) (*Client, error) {
 	ctx := context.Background()
 
 	client, err := pubsub.NewClient(ctx, projectID)
@@ -27,7 +27,7 @@ func NewClient(projectID, topicName string) (*Client, error) {
 
 	topic := client.Topic(topicName)
 
-	// Create the topic if it doesn't exist.
+	// Create the topic if it doesn't exist
 	exists, err := topic.Exists(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check topic existense: %v", err)
@@ -38,7 +38,20 @@ func NewClient(projectID, topicName string) (*Client, error) {
 		}
 	}
 
+	// Create subscription if it doesn't exists
 	sub := client.Subscription(topicName)
+	exists, err = sub.Exists(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check sub existense: %v", err)
+	}
+	if !exists {
+		if _, err = client.CreateSubscription(ctx, subName, pubsub.SubscriptionConfig{
+			Topic:       topic,
+			AckDeadline: publishTimeout,
+		}); err != nil {
+			return nil, fmt.Errorf("failed to create sub")
+		}
+	}
 
 	return &Client{topic: topic, sub: sub}, nil
 }
