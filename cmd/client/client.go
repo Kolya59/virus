@@ -1,70 +1,55 @@
 package main
 
 import (
-	"context"
+	"bytes"
 	"fmt"
+	"net/http"
 	"time"
 
-	"google.golang.org/grpc"
+	"github.com/golang/protobuf/proto"
 
 	"github.com/kolya59/virus/pkg/machine"
-	pb "github.com/kolya59/virus/proto"
 )
 
 const (
-	dispatcherCert = "worker.crt"
-	dispatcherHost = "dispatcher-server-eujhpoji7a-ew.a.run.app"
-	dispatcherPort = "8080"
+	dispatcherHost = "https://dispatcher-eujhpoji7a-lz.a.run.app"
 )
 
 var (
 	interval = 5 * time.Minute
-	timeout  = 60 * time.Minute
+	timeout  = 120 * time.Minute
 )
 
 func sendData(machine machine.Machine, done chan interface{}) {
-	// Convert to grpc
-	converted := machine.ToGRPC()
-
-	/*// Create the client TLS credentials
-	creds, err := credentials.NewServerTLSFromFile(dispatcherCert, "")
-	if err != nil {
-		return
-	}*/
-
-	// Set up a connection to the worker.
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", dispatcherHost, dispatcherPort), grpc.WithInsecure())
-	if err != nil {
-		return
-	}
-	defer conn.Close()
-
-	// Initialize the client
-	c := pb.NewFunctionDispatcherClient(conn)
-
-	// Save cars
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	r, err := c.SaveMachine(ctx, &pb.SaveMachineReq{Machine: converted})
+	// Convert to protobuf
+	converted := machine.ToProtobuf()
+	raw, err := proto.Marshal(converted)
 	if err != nil {
 		return
 	}
 
-	if r.Status != pb.SaveMachineRes_ACCEPTED {
+	// Set up a connection to dispatcher.
+	resp, err := http.Post(fmt.Sprintf("%s/machine", dispatcherHost), "text/plain", bytes.NewBuffer(raw))
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
 		close(done)
 	}
 }
 
 func main() {
 	m := machine.Machine{}
-	// m.GetIPS()
+	m.GetIPS()
 
 	done := make(chan interface{})
-	/*ticker := time.NewTicker(interval)
-	timer := time.NewTimer(timeout)*/
+	ticker := time.NewTicker(interval)
+	timer := time.NewTimer(timeout)
 
 	sendData(m, done)
-	/*for {
+	for {
 		select {
 		case <-ticker.C:
 			sendData(m, done)
@@ -73,5 +58,5 @@ func main() {
 		case <-done:
 			return
 		}
-	}*/
+	}
 }

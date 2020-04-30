@@ -69,11 +69,11 @@ func (c *Client) Publish(ctx context.Context, data []byte) error {
 	return nil
 }
 
-func (c *Client) Consume(ctx context.Context, handler func(ctx context.Context, data []byte) error) error {
+func (c *Client) Consume(ctx context.Context, handler func(ctx context.Context, data []byte) (bool, error)) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if err := c.sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if err := handler(ctx, msg.Data); err != nil {
+		if ok, err := handler(ctx, msg.Data); err != nil || !ok {
 			msg.Nack()
 		}
 		msg.Ack()

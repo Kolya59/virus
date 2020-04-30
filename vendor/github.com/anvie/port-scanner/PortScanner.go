@@ -12,18 +12,18 @@ import (
 	"fmt"
 	//	"io/ioutil"
 	//	"strings"
-	"sync"
 	"time"
+	"sync"
 
 	"github.com/anvie/port-scanner/predictors"
 	"github.com/anvie/port-scanner/predictors/webserver"
 )
 
 type PortScanner struct {
-	host         string
-	predictors   []predictors.Predictor
-	timeout      time.Duration
-	threads      int
+	host       string
+	predictors []predictors.Predictor
+	timeout    time.Duration
+	threads    int
 	usePredictor bool
 }
 
@@ -79,7 +79,7 @@ func (h PortScanner) GetOpenedPort(portStart int, portEnds int) []int {
 				rv = append(rv, port)
 				l.Unlock()
 			}
-			<-sem
+			<- sem
 		}(port)
 	}
 	for i := 0; i < cap(sem); i++ {

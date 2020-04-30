@@ -3,40 +3,52 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/go-chi/chi"
 	"github.com/rs/zerolog/log"
-	"google.golang.org/grpc"
 
 	"github.com/kolya59/virus/pkg/pubsub"
-	pb "github.com/kolya59/virus/proto"
 )
 
-type server struct {
+var (
+	publishTimeout = 5 * time.Second
+)
+
+type service struct {
 	client *pubsub.Client
 }
 
-func (s server) SaveMachine(ctx context.Context, req *pb.SaveMachineReq) (*pb.SaveMachineRes, error) {
-	// Unmarshal Machine from gRPC msg to raw bytes
-	data, err := proto.Marshal(req.Machine)
+// Save machine handler
+func (s service) SaveMachine(w http.ResponseWriter, r *http.Request) {
+	log.Info().Msg("Save machine")
+
+	// Get body
+	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal msg")
-		return nil, err
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	// Publish raw bytes to pubsub
+	ctx, cancel := context.WithTimeout(context.Background(), publishTimeout)
+	defer cancel()
 	if err := s.client.Publish(ctx, data); err != nil {
 		log.Error().Err(err).Msg("Failed to publish msg")
-		return nil, err
+		w.WriteHeader(http.StatusUnprocessableEntity)
 	}
 
-	return &pb.SaveMachineRes{Status: pb.SaveMachineRes_ACCEPTED}, nil
+	w.WriteHeader(http.StatusOK)
 }
 
-func (s server) Check(context.Context, *pb.HealthCheckReq) (*pb.HealthCheckRes, error) {
-	return &pb.HealthCheckRes{Status: pb.HealthCheckRes_SERVING}, nil
+// Check server handler
+func (s service) Check(w http.ResponseWriter, r *http.Request) {
+	log.Info().Msg("Health check")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
 func main() {
@@ -66,35 +78,26 @@ func main() {
 		port = "8080"
 	}
 
-	// Create the channel to listen on
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to listen")
-	}
-
-	/*// TODO Create the TLS credentials
-	creds, err := credentials.NewServerTLSFromFile(crt, key)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load TLS keys")
-	}*/
-
-	// Create the gRPC worker with the credentials
-	srv := grpc.NewServer()
-	// TODO srv := grpc.NewServer(grpc.Creds(creds))
-
+	// Initialize pub sub client
 	psClient, err := pubsub.NewClient(projectID, topicName, subName)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}
 
-	s := server{client: psClient}
+	s := service{client: psClient}
 
-	// Register the handler object
-	pb.RegisterFunctionDispatcherServer(srv, s)
+	// Initialize server
+	r := chi.NewRouter()
+	r.Post("/machine", s.SaveMachine)
+	r.Get("/health", s.Check)
+
+	srv := http.Server{
+		Addr:    fmt.Sprintf(":%v", port),
+		Handler: r,
+	}
 
 	log.Info().Msg("Start to serve")
-	// Serve and Listen
-	if err := srv.Serve(lis); err != nil {
-		log.Fatal().Err(err).Msg("Failed to serve")
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to listen and serve")
 	}
 }

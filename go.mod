@@ -10,6 +10,7 @@ require (
 	github.com/anvie/port-scanner v0.0.0-20180225151059-8159197d3770
 	github.com/aokoli/goutils v1.1.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.3.0 // indirect
+	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.0
 	github.com/google/uuid v1.1.1 // indirect

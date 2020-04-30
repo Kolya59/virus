@@ -21,21 +21,21 @@ type server struct {
 }
 
 // handleMsg handles messages from pubsub and pass it to firestore
-func (s *server) handleMsg(ctx context.Context, data []byte) error {
+func (s *server) handleMsg(ctx context.Context, data []byte) (bool, error) {
 	// Unmarshal data from pubsub to Machine
 	var msg pb.Machine
 	if err := proto.Unmarshal(data, &msg); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal msg")
-		return err
+		return true, err
 	}
 
 	// Save Machine to firestore
 	if err := s.saveMachine(ctx, msg); err != nil {
 		log.Error().Err(err).Msg("Failed to save machine")
-		return err
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
 // saveMachine saves machine's to firestore

@@ -3,15 +3,12 @@
 
 package pb
 
+import proto "github.com/golang/protobuf/proto"
+import fmt "fmt"
+import math "math"
+
 import (
-	fmt "fmt"
-
-	proto "github.com/golang/protobuf/proto"
-
-	math "math"
-
 	context "golang.org/x/net/context"
-
 	grpc "google.golang.org/grpc"
 )
 
@@ -169,7 +166,7 @@ func (c *functionDispatcherClient) Check(ctx context.Context, in *HealthCheckReq
 
 func (c *functionDispatcherClient) SaveMachine(ctx context.Context, in *SaveMachineReq, opts ...grpc.CallOption) (*SaveMachineRes, error) {
 	out := new(SaveMachineRes)
-	err := c.cc.Invoke(ctx, "/pb.FunctionDispatcher/saveMachine", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.FunctionDispatcher/SaveMachine", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +211,7 @@ func _FunctionDispatcher_SaveMachine_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.FunctionDispatcher/saveMachine",
+		FullMethod: "/pb.FunctionDispatcher/SaveMachine",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FunctionDispatcherServer).SaveMachine(ctx, req.(*SaveMachineReq))
@@ -231,7 +228,7 @@ var _FunctionDispatcher_serviceDesc = grpc.ServiceDesc{
 			Handler:    _FunctionDispatcher_Check_Handler,
 		},
 		{
-			MethodName: "saveMachine",
+			MethodName: "SaveMachine",
 			Handler:    _FunctionDispatcher_SaveMachine_Handler,
 		},
 	},

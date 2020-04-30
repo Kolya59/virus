@@ -58,9 +58,9 @@ type ExtendedIface struct {
 	Err       error
 }
 
-func (i *ExtendedIface) ToGRPC() *machine.Iface {
+func (i *ExtendedIface) ToProtobuf() *machine.Iface {
 	converted := &machine.Iface{}
-	if i.Err != nil {
+	if i.Err == nil {
 		addresses := make([]*machine.Address, len(i.Addresses))
 		for i, address := range i.Addresses {
 			addresses[i] = address.ToGRPC()
@@ -117,14 +117,14 @@ func (m *Machine) GetIPS() {
 	m.Ifaces = extenedIfaces
 }
 
-func (m *Machine) ToGRPC() *machine.Machine {
+func (m *Machine) ToProtobuf() *machine.Machine {
 	converted := &machine.Machine{}
 	if m.Err != nil {
 		converted.Error = m.Err.Error()
 	} else {
 		ifaces := make([]*machine.Iface, len(m.Ifaces))
 		for i, iface := range m.Ifaces {
-			ifaces[i] = iface.ToGRPC()
+			ifaces[i] = iface.ToProtobuf()
 		}
 		converted.Ifaces = ifaces
 	}
