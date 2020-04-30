@@ -47,7 +47,7 @@ func NewClient(projectID, topicName, subName string) (*Client, error) {
 	if !exists {
 		if _, err = client.CreateSubscription(ctx, subName, pubsub.SubscriptionConfig{
 			Topic:       topic,
-			AckDeadline: publishTimeout,
+			AckDeadline: time.Minute,
 		}); err != nil {
 			return nil, fmt.Errorf("failed to create sub: %v", err)
 		}

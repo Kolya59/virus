@@ -54,8 +54,8 @@ func main() {
 
 	// Get sub name from ENV
 	subName := os.Getenv("SUB")
-	if topicName == "" {
-		topicName = "machines-sub"
+	if subName == "" {
+		subName = "machines-sub"
 	}
 
 	log.Info().Msgf("ProjectID: %v Topic: %v Sub: %v", projectID, topicName, subName)
