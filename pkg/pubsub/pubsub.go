@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -73,10 +74,15 @@ func (c *Client) Consume(ctx context.Context, handler func(ctx context.Context, 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if err := c.sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if ok, err := handler(ctx, msg.Data); err != nil || !ok {
+		ok, err := handler(ctx, msg.Data)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to handle data")
+		}
+		if ok {
+			msg.Ack()
+		} else {
 			msg.Nack()
 		}
-		msg.Ack()
 	}); err != nil {
 		return fmt.Errorf("receive error: %v", err)
 	}

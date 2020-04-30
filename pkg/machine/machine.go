@@ -5,8 +5,6 @@ import (
 	"time"
 
 	portscanner "github.com/anvie/port-scanner"
-
-	machine "github.com/kolya59/virus/proto"
 )
 
 type Port struct {
@@ -14,13 +12,13 @@ type Port struct {
 	Service string
 }
 
-func (p *Port) ToGRPC() *machine.Port {
+/*func (p *Port) ToProtobuf() *machine.Port {
 	converted := &machine.Port{
 		Port:    uint32(p.Port),
 		Service: p.Service,
 	}
 	return converted
-}
+}*/
 
 type Address struct {
 	IP          net.IP
@@ -42,15 +40,15 @@ func (a *Address) ScanPorts() {
 	}
 }
 
-func (a *Address) ToGRPC() *machine.Address {
+/*func (a *Address) ToProtobuf() *machine.Address {
 	converted := &machine.Address{}
 	converted.Ip = a.IP.String()
 	converted.Ports = make([]*machine.Port, len(a.OpenedPorts))
 	for i, port := range a.OpenedPorts {
-		converted.Ports[i] = port.ToGRPC()
+		converted.Ports[i] = port.ToProtobuf()
 	}
 	return converted
-}
+}*/
 
 type ExtendedIface struct {
 	Iface     string
@@ -58,19 +56,19 @@ type ExtendedIface struct {
 	Err       error
 }
 
-func (i *ExtendedIface) ToProtobuf() *machine.Iface {
+/*func (i *ExtendedIface) ToProtobuf() *machine.Iface {
 	converted := &machine.Iface{}
 	if i.Err == nil {
 		addresses := make([]*machine.Address, len(i.Addresses))
 		for i, address := range i.Addresses {
-			addresses[i] = address.ToGRPC()
+			addresses[i] = address.ToProtobuf()
 		}
 	} else {
 		converted.Error = i.Err.Error()
 	}
 
 	return converted
-}
+}*/
 
 type Machine struct {
 	Ifaces []ExtendedIface
@@ -117,7 +115,7 @@ func (m *Machine) GetIPS() {
 	m.Ifaces = extenedIfaces
 }
 
-func (m *Machine) ToProtobuf() *machine.Machine {
+/*func (m *Machine) ToProtobuf() *machine.Machine {
 	converted := &machine.Machine{}
 	if m.Err != nil {
 		converted.Error = m.Err.Error()
@@ -130,4 +128,4 @@ func (m *Machine) ToProtobuf() *machine.Machine {
 	}
 
 	return converted
-}
+}*/

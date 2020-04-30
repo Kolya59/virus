@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/golang/protobuf/proto"
 	"github.com/rs/zerolog/log"
 
 	"github.com/kolya59/virus/pkg/pubsub"
-	pb "github.com/kolya59/virus/proto"
 )
 
 var saveTimeout = 5 * time.Second
@@ -23,8 +22,8 @@ type server struct {
 // handleMsg handles messages from pubsub and pass it to firestore
 func (s *server) handleMsg(ctx context.Context, data []byte) (bool, error) {
 	// Unmarshal data from pubsub to Machine
-	var msg pb.Machine
-	if err := proto.Unmarshal(data, &msg); err != nil {
+	var msg map[string]interface{}
+	if err := json.Unmarshal(data, &msg); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal msg")
 		return true, err
 	}
@@ -39,24 +38,14 @@ func (s *server) handleMsg(ctx context.Context, data []byte) (bool, error) {
 }
 
 // saveMachine saves machine's to firestore
-func (s *server) saveMachine(ctx context.Context, data pb.Machine) error {
-	converted := convertData(data)
-
+func (s *server) saveMachine(ctx context.Context, data map[string]interface{}) error {
 	ctx, cancel := context.WithTimeout(ctx, saveTimeout)
 	defer cancel()
-	if _, _, err := s.firestore.Collection("users").Add(ctx, converted); err != nil {
+	if _, _, err := s.firestore.Collection("machines").Add(ctx, data); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// convertData converts pb.Machine to map
-func convertData(raw pb.Machine) map[string]interface{} {
-	res := make(map[string]interface{})
-	// TODO Check
-	res["machine"] = raw
-	return res
 }
 
 func main() {

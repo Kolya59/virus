@@ -2,11 +2,10 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/golang/protobuf/proto"
 
 	"github.com/kolya59/virus/pkg/machine"
 )
@@ -21,9 +20,8 @@ var (
 )
 
 func sendData(machine machine.Machine, done chan interface{}) {
-	// Convert to protobuf
-	converted := machine.ToProtobuf()
-	raw, err := proto.Marshal(converted)
+	// Marshal data
+	raw, err := json.Marshal(machine)
 	if err != nil {
 		return
 	}
