@@ -67,8 +67,11 @@ func (s service) SaveMachine(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
 
-	// Make Websocket connection
+// Subscribe to changes handler
+func (s service) Subscribe(w http.ResponseWriter, r *http.Request) {
 	c, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to upgrade conn")
@@ -78,7 +81,7 @@ func (s service) SaveMachine(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 
 	// Subscribe to commands topic
-	ctx, cancel = context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	if err := s.commandsClient.Consume(ctx, func(ctx context.Context, data []byte) (bool, error) {
 		if err := c.WriteJSON(data); err != nil {
@@ -107,6 +110,28 @@ func (s service) SaveMachine(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+// Publish commands handler
+func (s service) PublishCommand(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to read msg")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+	}
+
+	var msg models.WSCommand
+	if err := json.Unmarshal(data, &msg); err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal msg")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+	}
+
+	if err := s.commandsClient.Publish(context.Background(), data); err != nil {
+		log.Error().Err(err).Msg("Failed to publish msg")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // Check server handler
@@ -174,6 +199,7 @@ func main() {
 	// Initialize server
 	r := chi.NewRouter()
 	r.Post("/machine", s.SaveMachine)
+	r.HandleFunc("/subscribe", s.Subscribe)
 	r.Get("/health", s.Check)
 
 	srv := http.Server{
