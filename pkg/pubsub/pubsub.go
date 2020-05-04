@@ -18,7 +18,7 @@ type Client struct {
 	sub   *pubsub.Subscription
 }
 
-func NewClient(projectID, topicName, subName string) (*Client, error) {
+func NewClient(projectID, topicName, subName string, timeout time.Duration) (*Client, error) {
 	ctx := context.Background()
 
 	client, err := pubsub.NewClient(ctx, projectID)
@@ -48,7 +48,7 @@ func NewClient(projectID, topicName, subName string) (*Client, error) {
 	if !exists {
 		if _, err = client.CreateSubscription(ctx, subName, pubsub.SubscriptionConfig{
 			Topic:       topic,
-			AckDeadline: time.Minute,
+			AckDeadline: timeout,
 		}); err != nil {
 			return nil, fmt.Errorf("failed to create sub: %v", err)
 		}

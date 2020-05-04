@@ -82,7 +82,7 @@ func main() {
 	defer srv.firestore.Close()
 
 	// Initialize pubsub client
-	srv.pubsub, err = pubsub.NewClient(projectID, topicName, subName)
+	srv.pubsub, err = pubsub.NewClient(projectID, topicName, subName, saveTimeout)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}

@@ -71,8 +71,9 @@ type ExtendedIface struct {
 }*/
 
 type Machine struct {
-	Ifaces []ExtendedIface
-	Err    error
+	ExternalIP string
+	Ifaces     []ExtendedIface
+	Err        error
 }
 
 func (m *Machine) GetIPS() {

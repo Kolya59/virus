@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -19,34 +20,41 @@ var (
 	timeout  = 120 * time.Minute
 )
 
-func sendData(machine machine.Machine, done chan interface{}) {
+func sendData(machine machine.Machine) error {
 	// Marshal data
 	raw, err := json.Marshal(machine)
 	if err != nil {
-		return
+		return err
 	}
 
 	// Set up a connection to dispatcher.
-	resp, err := http.Post(fmt.Sprintf("%s/machine", dispatcherHost), "text/plain", bytes.NewBuffer(raw))
+	resp, err := http.Post(fmt.Sprintf("%s/machine", dispatcherHost), "application/json", bytes.NewBuffer(raw))
 	if err != nil {
-		return
+		return err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
-		close(done)
+	if resp.StatusCode != http.StatusOK {
+		return err
 	}
+	return nil
+}
+
+func subscribeForCommands(ctx context.Context) {
+
 }
 
 func main() {
 	m := machine.Machine{}
 	m.GetIPS()
 
-	done := make(chan interface{})
 	ticker := time.NewTicker(interval)
 	timer := time.NewTimer(timeout)
 
-	sendData(m, done)
+	ctx := context.Background()
+	sendData(m)
+
+	ctx.Err()
 	for {
 		select {
 		case <-ticker.C:
