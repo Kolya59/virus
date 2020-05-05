@@ -1,7 +1,7 @@
 package predictors
 
 import (
-//	"net"
+	//	"net"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ type DetailPredictor interface {
 }
 
 type BaseHttpPredictor struct {
-//	DetailPredictor
+	//	DetailPredictor
 }
 
 func (pa *BaseHttpPredictor) PredictResponse(resp string, dp DetailPredictor) string {

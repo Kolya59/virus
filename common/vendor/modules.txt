@@ -11,6 +11,11 @@ cloud.google.com/go/pubsub/apiv1
 cloud.google.com/go/pubsub/internal/distribution
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
+# github.com/anvie/port-scanner v0.0.0-20180225151059-8159197d3770
+## explicit
+github.com/anvie/port-scanner
+github.com/anvie/port-scanner/predictors
+github.com/anvie/port-scanner/predictors/webserver
 # github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.3.4

@@ -1,23 +1,23 @@
 package webserver
 
 import (
+	"github.com/anvie/port-scanner/predictors"
+	"io/ioutil"
 	"net"
 	"strings"
-	"io/ioutil"
 	"time"
-	"github.com/anvie/port-scanner/predictors"
+	//	"fmt"
 )
 
-type ApachePredictor struct {
-	*predictors.BaseHttpPredictor
+type NginxPredictor struct {
+	predictors.BaseHttpPredictor
 }
 
-
-func (p *ApachePredictor) Predict(host string) string {
+func (p *NginxPredictor) Predict(host string) string {
 	duration, _ := time.ParseDuration("3s")
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", host)
-	if (err != nil) {
+	if err != nil {
 		return ""
 	}
 
@@ -42,10 +42,9 @@ func (p *ApachePredictor) Predict(host string) string {
 	return p.PredictResponse(resp, p)
 }
 
-func (p *ApachePredictor) PredictResponseDetail(resp string) string {
-	if strings.Contains(resp, "Apache/") {
-		return "Apache"
+func (p *NginxPredictor) PredictResponseDetail(resp string) string {
+	if strings.Contains(resp, "nginx/") {
+		return "Nginx [ http://wiki.nginx.org/Main ]"
 	}
 	return ""
 }
-
