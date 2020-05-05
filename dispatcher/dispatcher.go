@@ -98,8 +98,10 @@ func (s service) Subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
+	cnt := 0
 	for input := range s.commandsChan {
-		log.Info().Msgf("Got msg for %v", r.RemoteAddr)
+		cnt++
+		log.Info().Msgf("Got %d msg for %v", cnt, r.RemoteAddr)
 		if err := c.WriteJSON(input.command); err != nil {
 			log.Error().Err(err).Msg("Failed to write json")
 			return
@@ -120,12 +122,31 @@ func (s service) PublishCommand(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read msg")
 		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
 	}
 
 	var msg models.WSCommand
 	if err := json.Unmarshal(data, &msg); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal msg")
 		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	/*if _, err := url.Parse(msg.Addr); err != nil {
+		log.Error().Err(err).Msg("Failed to parse url")
+		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}*/
+
+	switch msg.Type {
+	case "tcp", "tcp4", "tcp6", "udp", "udp4", "udp6", "ip", "ip4", "ip6", "unix", "unixgram", "unixpacket":
+		break
+	default:
+		log.Error().Err(err).Msg("Invalid type")
+		w.Write([]byte("Invalid type"))
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
 	}
 
 	log.Info().Msgf("Publish command: %v", msg)
@@ -196,7 +217,7 @@ func main() {
 			delete(s.ack, id)
 			if ack.Err != "" {
 				log.Error().Err(err).Msg("Failed to do requests")
-				return true, err
+				return false, err
 			}
 
 			return true, nil
