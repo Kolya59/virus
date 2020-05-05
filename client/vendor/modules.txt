@@ -8,7 +8,7 @@ github.com/gorilla/websocket
 # github.com/jessevdk/go-flags v1.4.0
 ## explicit
 github.com/jessevdk/go-flags
-# github.com/kolya59/virus/common v0.0.0-20200505170655-f9a0b1d8c157
+# github.com/kolya59/virus/common v0.0.0-20200505194043-3797f2cc11ed
 ## explicit
 github.com/kolya59/virus/common/machine
 github.com/kolya59/virus/common/models

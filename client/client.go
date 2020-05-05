@@ -96,20 +96,18 @@ func main() {
 	m := machine.Machine{}
 	m.GetIPS()
 
-	file, err := os.OpenFile("tmp", os.O_RDWR, 0666)
+	// TODO: FIX
+	id, err := ioutil.ReadFile("./tmp")
 	if err != nil {
 		m.ID = uuid.NewV4().String()
+		ioutil.WriteFile("./tmp", []byte(m.ID), os.ModeIrregular)
 	} else {
-		defer file.Close()
-
-		id, err := ioutil.ReadAll(file)
+		uid, err := uuid.FromString(string(id))
 		if err != nil {
 			m.ID = uuid.NewV4().String()
+			ioutil.WriteFile("./tmp", []byte(m.ID), os.ModeIrregular)
 		} else {
-			if m.ID, err = uuid.FromString(string(id)); err != nil {
-				m.ID = uuid.NewV4().String()
-				file.WriteString(m.ID)
-			}
+			m.ID = uid.String()
 		}
 	}
 

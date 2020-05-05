@@ -96,6 +96,8 @@ github.com/kolya59/virus v0.0.0-20200504170851-84114a5d5256 h1:XqMFvAYLCykJqhkgT
 github.com/kolya59/virus v0.0.0-20200505170655-f9a0b1d8c157 h1:Fomp5BQ9ZdkDy3mPg/Fcku2XSTQ3wUBDOVS8VQTSQ1s=
 github.com/kolya59/virus/common v0.0.0-20200505170655-f9a0b1d8c157 h1:d2w9TtZJBo0jcsdhGff1sq3/YyjmeUm9nL0BG62gGnM=
 github.com/kolya59/virus/common v0.0.0-20200505170655-f9a0b1d8c157/go.mod h1:Me/YCogQdJ2SgfeasoXvocieL3H3x4TloiDiNV9obZI=
+github.com/kolya59/virus/common v0.0.0-20200505194043-3797f2cc11ed h1:4Z1mcas/9mokhpWhKQ5+JJfLOt39H3KIoeLi49e+/Vs=
+github.com/kolya59/virus/common v0.0.0-20200505194043-3797f2cc11ed/go.mod h1:Me/YCogQdJ2SgfeasoXvocieL3H3x4TloiDiNV9obZI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
