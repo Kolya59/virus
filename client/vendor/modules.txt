@@ -12,3 +12,6 @@ github.com/jessevdk/go-flags
 ## explicit
 github.com/kolya59/virus/common/machine
 github.com/kolya59/virus/common/models
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid

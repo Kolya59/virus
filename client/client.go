@@ -3,15 +3,18 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/jessevdk/go-flags"
 	"github.com/kolya59/virus/common/machine"
 	"github.com/kolya59/virus/common/models"
+	uuid "github.com/satori/go.uuid"
 )
 
 type options struct {
@@ -92,6 +95,23 @@ func main() {
 
 	m := machine.Machine{}
 	m.GetIPS()
+
+	file, err := os.OpenFile("tmp", os.O_RDWR, 0666)
+	if err != nil {
+		m.ID = uuid.NewV4().String()
+	} else {
+		defer file.Close()
+
+		id, err := ioutil.ReadAll(file)
+		if err != nil {
+			m.ID = uuid.NewV4().String()
+		} else {
+			if m.ID, err = uuid.FromString(string(id)); err != nil {
+				m.ID = uuid.NewV4().String()
+				file.WriteString(m.ID)
+			}
+		}
+	}
 
 	ticker := time.NewTicker(interval)
 	errs := make(chan error, 1)
