@@ -58,6 +58,9 @@ github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid
 # go.opencensus.io v0.22.3
 go.opencensus.io
 go.opencensus.io/internal

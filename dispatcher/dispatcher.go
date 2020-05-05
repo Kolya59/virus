@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 	"github.com/jessevdk/go-flags"
 	"github.com/rs/zerolog/log"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/kolya59/virus/common/machine"
 	"github.com/kolya59/virus/common/models"
@@ -34,7 +36,15 @@ type options struct {
 type service struct {
 	dataClient     *pubsub.Client
 	commandsClient *pubsub.Client
+	commandsChan   chan commandWithId
+	ack            map[string]chan models.WSAck
+	mu             sync.Mutex
 	upgrader       websocket.Upgrader
+}
+
+type commandWithId struct {
+	id      string
+	command models.WSCommand
 }
 
 // Save machine handler
@@ -90,40 +100,19 @@ func (s service) Subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	// Subscribe to commands topic
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	if err := s.commandsClient.Consume(ctx, func(ctx context.Context, data []byte) (bool, error) {
-		var input models.WSCommand
-		if err := json.Unmarshal(data, &input); err != nil {
-			log.Error().Err(err).Msg("Failed to read input json")
-			return false, err
-		}
-		if err := c.WriteJSON(input); err != nil {
-			if websocket.IsUnexpectedCloseError(err) {
-				ctx.Done()
-			}
+	for input := range s.commandsChan {
+		log.Info().Msgf("Got msg for %v", r.RemoteAddr)
+		if err := c.WriteJSON(input.command); err != nil {
 			log.Error().Err(err).Msg("Failed to write json")
-			return false, err
+			return
 		}
 
 		var res models.WSAck
 		if err := c.ReadJSON(&res); err != nil {
 			log.Error().Err(err).Msg("Failed to read json")
-			return false, err
+			return
 		}
-
-		// TODO: Think about ACK
-		if res.Err != nil {
-			log.Error().Err(err).Msg("Failed to do requests")
-			return true, err
-		}
-
-		return true, nil
-	}); err != nil {
-		log.Error().Err(err).Msg("Failed to consume")
-		c.WriteControl(websocket.CloseAbnormalClosure, nil, time.Now().Add(5*time.Second))
-		return
+		s.ack[input.id] <- res
 	}
 }
 
@@ -147,6 +136,7 @@ func (s service) PublishCommand(w http.ResponseWriter, r *http.Request) {
 		if err := s.commandsClient.Publish(context.Background(), data); err != nil {
 			log.Error().Err(err).Msg("Failed to publish msg")
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -181,8 +171,41 @@ func main() {
 	s := service{
 		dataClient:     dataClient,
 		commandsClient: commandsClient,
+		commandsChan:   make(chan commandWithId),
+		ack:            make(map[string]chan models.WSAck),
 		upgrader:       websocket.Upgrader{},
 	}
+
+	ctx := context.Background()
+	go func() {
+		if err := s.commandsClient.Consume(ctx, func(ctx context.Context, data []byte) (bool, error) {
+			log.Info().Msgf("Got command: %s", data)
+			var input models.WSCommand
+			if err := json.Unmarshal(data, &input); err != nil {
+				log.Error().Err(err).Msg("Failed to read input json")
+				return false, err
+			}
+			id := uuid.NewV4().String()
+			s.ack[id] = make(chan models.WSAck)
+			s.commandsChan <- commandWithId{
+				id:      id,
+				command: input,
+			}
+			ack, ok := <-s.ack[id]
+			if !ok {
+				return false, nil
+			}
+			delete(s.ack, id)
+			if ack.Err != nil {
+				log.Error().Err(err).Msg("Failed to do requests")
+				return true, err
+			}
+
+			return true, nil
+		}); err != nil {
+			log.Fatal().Msgf("Failed to consume: %v", err)
+		}
+	}()
 
 	// Initialize server
 	r := chi.NewRouter()

@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/jessevdk/go-flags"
 	"github.com/rs/zerolog/log"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/kolya59/virus/common/pubsub"
 )
@@ -45,9 +46,14 @@ func (s *server) handleMsg(ctx context.Context, data []byte) (bool, error) {
 
 // saveMachine saves machine's to firestore
 func (s *server) saveMachine(ctx context.Context, data map[string]interface{}) error {
+	key, ok := data["ExternalIP"]
+	if !ok {
+		key = uuid.NewV4().String()
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, saveTimeout)
 	defer cancel()
-	if _, _, err := s.firestore.Collection("machines").Add(ctx, data); err != nil {
+	if _, err := s.firestore.Collection("machines").Doc(key.(string)).Set(ctx, data); err != nil {
 		return err
 	}
 
