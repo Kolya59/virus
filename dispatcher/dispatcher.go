@@ -194,7 +194,7 @@ func main() {
 				return false, nil
 			}
 			delete(s.ack, id)
-			if ack.Err != nil {
+			if ack.Err != "" {
 				log.Error().Err(err).Msg("Failed to do requests")
 				return true, err
 			}

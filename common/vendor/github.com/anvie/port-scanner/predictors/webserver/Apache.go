@@ -1,22 +1,23 @@
 package webserver
 
 import (
-	"github.com/anvie/port-scanner/predictors"
-	"io/ioutil"
 	"net"
 	"strings"
+	"io/ioutil"
 	"time"
+	"github.com/anvie/port-scanner/predictors"
 )
 
 type ApachePredictor struct {
 	*predictors.BaseHttpPredictor
 }
 
+
 func (p *ApachePredictor) Predict(host string) string {
 	duration, _ := time.ParseDuration("3s")
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", host)
-	if err != nil {
+	if (err != nil) {
 		return ""
 	}
 
@@ -47,3 +48,4 @@ func (p *ApachePredictor) PredictResponseDetail(resp string) string {
 	}
 	return ""
 }
+

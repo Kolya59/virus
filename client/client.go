@@ -66,7 +66,7 @@ func subscribeForCommands(dispatcherHost string) error {
 		nc, err := net.Dial(msg.Type, msg.Addr)
 		if err != nil {
 			ackMsg.Err = err
-			if err := c.WriteJSON(models.WSAck{Err: err}); err != nil {
+			if err := c.WriteJSON(models.WSAck{Err: err.Error()}); err != nil {
 				return err
 			}
 			continue
@@ -75,7 +75,7 @@ func subscribeForCommands(dispatcherHost string) error {
 		if _, err := nc.Write(msg.Data); err != nil {
 			ackMsg.Err = err
 			nc.Close()
-			if err := c.WriteJSON(models.WSAck{Err: err}); err != nil {
+			if err := c.WriteJSON(models.WSAck{Err: err.Error()}); err != nil {
 				return err
 			}
 			break
