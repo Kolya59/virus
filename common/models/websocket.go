@@ -8,5 +8,5 @@ type WSCommand struct {
 }
 
 type WSAck struct {
-	Err error `json:"err,omitempty"`
+	Err string `json:"err,omitempty"`
 }

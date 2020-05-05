@@ -22,7 +22,7 @@ type options struct {
 }
 
 var (
-	interval = 5 * time.Minute
+	interval = time.Minute
 )
 
 func sendData(machine machine.Machine, dispatcherHost string) error {

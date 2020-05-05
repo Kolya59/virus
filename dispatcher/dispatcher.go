@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -38,7 +37,6 @@ type service struct {
 	commandsClient *pubsub.Client
 	commandsChan   chan commandWithId
 	ack            map[string]chan models.WSAck
-	mu             sync.Mutex
 	upgrader       websocket.Upgrader
 }
 
