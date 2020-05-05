@@ -74,6 +74,7 @@ func (c *Client) Consume(ctx context.Context, handler func(ctx context.Context, 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if err := c.sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		log.Info().Msgf("Consumed: %v", msg)
 		ok, err := handler(ctx, msg.Data)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to handle data")
