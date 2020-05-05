@@ -1,0 +1,11 @@
+runtime: go
+env: flex
+network:
+  session_affinity: true
+
+main: ./cmd/dispatcher
+
+handlers:
+- url: /.*
+  secure: optional
+  script: auto
