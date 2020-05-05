@@ -46,7 +46,7 @@ func (s *server) handleMsg(ctx context.Context, data []byte) (bool, error) {
 
 // saveMachine saves machine's to firestore
 func (s *server) saveMachine(ctx context.Context, data map[string]interface{}) error {
-	key, ok := data["ExternalIP"]
+	key, ok := data["ID"]
 	if !ok {
 		key = uuid.NewV4().String()
 	}
