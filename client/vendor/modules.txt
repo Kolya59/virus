@@ -1,0 +1,17 @@
+# github.com/anvie/port-scanner v0.0.0-20180225151059-8159197d3770
+github.com/anvie/port-scanner
+github.com/anvie/port-scanner/predictors
+github.com/anvie/port-scanner/predictors/webserver
+# github.com/gorilla/websocket v1.4.2
+## explicit
+github.com/gorilla/websocket
+# github.com/jessevdk/go-flags v1.4.0
+## explicit
+github.com/jessevdk/go-flags
+# github.com/kolya59/virus/common v0.0.0-20200505202208-bbf06b6ab58f
+## explicit
+github.com/kolya59/virus/common/machine
+github.com/kolya59/virus/common/models
+# github.com/satori/go.uuid v1.2.0
+## explicit
+github.com/satori/go.uuid
