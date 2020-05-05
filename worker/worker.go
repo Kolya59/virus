@@ -3,16 +3,22 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/jessevdk/go-flags"
 	"github.com/rs/zerolog/log"
 
 	"github.com/kolya59/virus/common/pubsub"
 )
 
 var saveTimeout = 5 * time.Second
+
+type options struct {
+	ProjectID string `long:"projectID" env:"PROJECT_ID" required:"true" default:"trrp-virus"`
+	TopicName string `long:"TopicName" env:"TOPIC_NAME" required:"true" default:"machines"`
+	SubName   string `long:"SubName" env:"SUB_NAME" required:"true" default:"machines-sub"`
+}
 
 type server struct {
 	firestore *firestore.Client
@@ -49,32 +55,19 @@ func (s *server) saveMachine(ctx context.Context, data map[string]interface{}) e
 }
 
 func main() {
-	// Get project ID from ENV
-	projectID := os.Getenv("PROJECT_ID")
-	if projectID == "" {
-		projectID = "trrp-virus"
+	var opts options
+	if _, err := flags.Parse(&opts); err != nil {
+		return
 	}
 
-	// Get topic name from ENV
-	topicName := os.Getenv("TOPIC")
-	if topicName == "" {
-		topicName = "machines"
-	}
-
-	// Get sub name from ENV
-	subName := os.Getenv("SUB")
-	if subName == "" {
-		subName = "machines-sub"
-	}
-
-	log.Info().Msgf("ProjectID: %v Topic: %v Sub: %v", projectID, topicName, subName)
+	log.Info().Msgf("ProjectID: %v Topic: %v Sub: %v", opts.ProjectID, opts.TopicName, opts.SubName)
 
 	srv := server{}
 
 	// Get a Firestore firestore.
 	ctx := context.Background()
 	var err error
-	srv.firestore, err = firestore.NewClient(ctx, projectID)
+	srv.firestore, err = firestore.NewClient(ctx, opts.ProjectID)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create firestore")
 	}
@@ -82,7 +75,7 @@ func main() {
 	defer srv.firestore.Close()
 
 	// Initialize pubsub client
-	srv.pubsub, err = pubsub.NewClient(projectID, topicName, subName, saveTimeout)
+	srv.pubsub, err = pubsub.NewClient(opts.ProjectID, opts.TopicName, opts.SubName, saveTimeout)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize pubsub client")
 	}
