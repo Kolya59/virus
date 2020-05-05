@@ -22,7 +22,7 @@ type options struct {
 }
 
 var (
-	interval = time.Minute
+	interval = 10 * time.Second
 )
 
 func sendData(machine machine.Machine, dispatcherHost string) error {
@@ -65,7 +65,7 @@ func subscribeForCommands(dispatcherHost string) error {
 
 		nc, err := net.Dial(msg.Type, msg.Addr)
 		if err != nil {
-			ackMsg.Err = err
+			ackMsg.Err = err.Error()
 			if err := c.WriteJSON(models.WSAck{Err: err.Error()}); err != nil {
 				return err
 			}
@@ -73,12 +73,16 @@ func subscribeForCommands(dispatcherHost string) error {
 		}
 
 		if _, err := nc.Write(msg.Data); err != nil {
-			ackMsg.Err = err
+			ackMsg.Err = err.Error()
 			nc.Close()
 			if err := c.WriteJSON(models.WSAck{Err: err.Error()}); err != nil {
 				return err
 			}
 			break
+		}
+
+		if err := c.WriteJSON(models.WSAck{}); err != nil {
+			return err
 		}
 		nc.Close()
 	}
