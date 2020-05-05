@@ -33,7 +33,7 @@ func sendData(machine machine.Machine, dispatcherHost string) error {
 	}
 
 	// Set up a connection to dispatcher.
-	u := url.URL{Scheme: "http", Host: dispatcherHost, Path: "/machine"}
+	u := url.URL{Scheme: "https", Host: dispatcherHost, Path: "/machine"}
 	resp, err := http.Post(u.String(), "application/json", bytes.NewBuffer(raw))
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func sendData(machine machine.Machine, dispatcherHost string) error {
 }
 
 func subscribeForCommands(dispatcherHost string) error {
-	u := url.URL{Scheme: "ws", Host: dispatcherHost, Path: "/subscribe"}
+	u := url.URL{Scheme: "wss", Host: dispatcherHost, Path: "/subscribe"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
