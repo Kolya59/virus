@@ -71,6 +71,7 @@ type ExtendedIface struct {
 }*/
 
 type Machine struct {
+	ID         string
 	ExternalIP string
 	Ifaces     []ExtendedIface
 	Err        error
