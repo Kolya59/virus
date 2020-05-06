@@ -132,13 +132,6 @@ func (s service) PublishCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/*if _, err := url.Parse(msg.Addr); err != nil {
-		log.Error().Err(err).Msg("Failed to parse url")
-		w.Write([]byte(err.Error()))
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}*/
-
 	switch msg.Type {
 	case "tcp", "tcp4", "tcp6", "udp", "udp4", "udp6", "ip", "ip4", "ip6", "unix", "unixgram", "unixpacket":
 		break

@@ -12,6 +12,12 @@ github.com/jessevdk/go-flags
 ## explicit
 github.com/kolya59/virus/common/machine
 github.com/kolya59/virus/common/models
+# github.com/rs/zerolog v1.18.0
+## explicit
+github.com/rs/zerolog
+github.com/rs/zerolog/internal/cbor
+github.com/rs/zerolog/internal/json
+github.com/rs/zerolog/log
 # github.com/satori/go.uuid v1.2.0
 ## explicit
 github.com/satori/go.uuid

